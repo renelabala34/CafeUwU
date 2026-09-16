@@ -95,7 +95,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     setShowForm(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const productData = {
       name: formData.name,
@@ -116,18 +116,28 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       inStock: formData.inStock,
     };
 
-    if (editingProduct) {
-      updateProduct(editingProduct.id, productData);
-    } else {
-      addProduct(productData);
+    try {
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, productData);
+      } else {
+        await addProduct(productData);
+      }
+      setShowForm(false);
+      setEditingProduct(null);
+    } catch (err) {
+      console.error("Error al guardar producto:", err);
+      alert("Error al guardar el producto. Por favor, intenta de nuevo.");
     }
-    setShowForm(false);
-    setEditingProduct(null);
   };
 
-  const handleDelete = (id: number) => {
-    deleteProduct(id);
-    setDeleteConfirm(null);
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteProduct(id);
+      setDeleteConfirm(null);
+    } catch (err) {
+      console.error("Error al eliminar producto:", err);
+      alert("Error al eliminar el producto. Por favor, intenta de nuevo.");
+    }
   };
 
   const handleChange = (
