@@ -1,21 +1,28 @@
 import { useState, useMemo } from "react";
 import { CartProvider } from "./context/CartContext";
-import { products, categories, Product } from "./data/products";
+import { ProductProvider, useProducts } from "./context/ProductContext";
+import { categories, Product } from "./data/products";
 import Header from "./components/Header";
 import ProductCard from "./components/ProductCard";
 import ProductDetail from "./components/ProductDetail";
 import CartDrawer from "./components/CartDrawer";
-import Checkout, { OrderConfirmation } from "./components/Checkout";
-import { SlidersHorizontal, Coffee } from "lucide-react";
+import Checkout from "./components/Checkout";
+import AdminLogin from "./components/AdminLogin";
+import AdminPanel from "./components/AdminPanel";
+import { SlidersHorizontal, Coffee, Shield } from "lucide-react";
 
-type Page = "shop" | "checkout" | "confirmation";
+type Page = "shop" | "checkout" | "confirmation" | "admin-login" | "admin-panel";
 
 function ShopContent() {
+  const { products } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [page, setPage] = useState<Page>("shop");
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => sessionStorage.getItem("admin_auth") === "true"
+  );
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -30,25 +37,57 @@ function ShopContent() {
         selectedCategory === "Todos" || product.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, products]);
 
-  if (page === "checkout") {
+  // Admin Login page
+  if (page === "admin-login") {
     return (
-      <Checkout
+      <AdminLogin
+        onLogin={() => {
+          setIsAuthenticated(true);
+          setPage("admin-panel");
+        }}
         onBack={() => setPage("shop")}
-        onComplete={() => setPage("confirmation")}
       />
     );
   }
 
-  if (page === "confirmation") {
-    return <OrderConfirmation onBackToShop={() => setPage("shop")} />;
+  // Admin Panel page
+  if (page === "admin-panel") {
+    if (!isAuthenticated) {
+      return (
+        <AdminLogin
+          onLogin={() => {
+            setIsAuthenticated(true);
+            setPage("admin-panel");
+          }}
+          onBack={() => setPage("shop")}
+        />
+      );
+    }
+    return (
+      <AdminPanel
+        onLogout={() => {
+          sessionStorage.removeItem("admin_auth");
+          setIsAuthenticated(false);
+          setPage("shop");
+        }}
+        onBackToShop={() => setPage("shop")}
+      />
+    );
   }
 
+  // Checkout page
+  if (page === "checkout") {
+    return <Checkout onBack={() => setPage("shop")} />;
+  }
+
+  // Shop page
   return (
     <div className="min-h-screen bg-cream-50">
       <Header
         onCartClick={() => setCartOpen(true)}
+        onAdminClick={() => setPage("admin-login")}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
@@ -104,9 +143,13 @@ function ShopContent() {
         {/* Results count */}
         <div className="mb-6">
           <p className="text-sm text-coffee-500">
-            {filteredProducts.length} {filteredProducts.length === 1 ? "producto encontrado" : "productos encontrados"}
+            {filteredProducts.length}{" "}
+            {filteredProducts.length === 1 ? "producto encontrado" : "productos encontrados"}
             {searchQuery && (
-              <span> para "<span className="font-medium text-coffee-700">{searchQuery}</span>"</span>
+              <span>
+                {" "}
+                para "<span className="font-medium text-coffee-700">{searchQuery}</span>"
+              </span>
             )}
           </p>
         </div>
@@ -183,9 +226,16 @@ function ShopContent() {
               <h4 className="font-semibold text-cream-100 mb-3 text-sm">Contacto</h4>
               <ul className="space-y-2 text-sm text-cream-300/70">
                 <li>hola@origencoffee.es</li>
-                <li>+34 912 345 678</li>
-                <li>Madrid, España</li>
+                <li>+53 5680 3949</li>
+                <li>La Habana, Cuba</li>
               </ul>
+              <button
+                onClick={() => setPage("admin-login")}
+                className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cream-300/80 hover:text-cream-100 bg-cream-800/30 hover:bg-cream-800/50 rounded-full transition-all"
+              >
+                <Shield className="w-3 h-3" />
+                Panel Admin
+              </button>
             </div>
           </div>
           <div className="border-t border-cream-800/50 mt-10 pt-6 text-center">
@@ -219,8 +269,10 @@ function ShopContent() {
 
 export default function App() {
   return (
-    <CartProvider>
-      <ShopContent />
-    </CartProvider>
+    <ProductProvider>
+      <CartProvider>
+        <ShopContent />
+      </CartProvider>
+    </ProductProvider>
   );
 }

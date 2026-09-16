@@ -1,52 +1,87 @@
 import { useState } from "react";
-import { ArrowLeft, CreditCard, Truck, Check, Lock } from "lucide-react";
+import { ArrowLeft, MessageCircle, ShoppingBag, MapPin, User, Phone } from "lucide-react";
 import { useCart } from "../context/CartContext";
 
 interface CheckoutProps {
   onBack: () => void;
-  onComplete: () => void;
 }
 
-export default function Checkout({ onBack, onComplete }: CheckoutProps) {
+const WHATSAPP_NUMBER = "5356803949";
+
+export default function Checkout({ onBack }: CheckoutProps) {
   const { items, totalPrice, clearCart } = useCart();
-  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    phone: "",
     address: "",
-    city: "",
-    zip: "",
-    cardNumber: "",
-    cardExpiry: "",
-    cardCvc: "",
+    notes: "",
   });
-  const [processing, setProcessing] = useState(false);
+  const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (step === 1) {
-      setStep(2);
-    } else {
-      setProcessing(true);
-      setTimeout(() => {
-        clearCart();
-        setProcessing(false);
-        onComplete();
-      }, 2000);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  if (processing) {
+  const buildWhatsAppMessage = () => {
+    const lines: string[] = [];
+    lines.push("🛒 *Nuevo Pedido - Origen Coffee*");
+    lines.push("");
+    lines.push("👤 *Cliente:* " + formData.name);
+    lines.push("📱 *Teléfono:* " + formData.phone);
+    lines.push("📍 *Dirección:* " + formData.address);
+    if (formData.notes.trim()) {
+      lines.push("📝 *Notas:* " + formData.notes);
+    }
+    lines.push("");
+    lines.push("━━━━━━━━━━━━━━━━━━━━");
+    lines.push("*Productos:*");
+    lines.push("");
+    items.forEach((item, i) => {
+      lines.push(`${i + 1}. ${item.product.name}`);
+      lines.push(`   Cantidad: ${item.quantity} × €${item.product.price.toFixed(2)}`);
+      lines.push(`   Subtotal: €${(item.product.price * item.quantity).toFixed(2)}`);
+      lines.push("");
+    });
+    lines.push("━━━━━━━━━━━━━━━━━━━━");
+    lines.push(`💰 *TOTAL: €${totalPrice.toFixed(2)}*`);
+    lines.push("");
+    lines.push("¡Gracias por tu pedido! ☕");
+    return lines.join("\n");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const message = buildWhatsAppMessage();
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, "_blank");
+    clearCart();
+    setSent(true);
+  };
+
+  if (sent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cream-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-coffee-200 border-t-coffee-700 rounded-full animate-spin mx-auto mb-6" />
-          <h2 className="text-xl font-bold text-coffee-900 mb-2">Procesando tu pedido...</h2>
-          <p className="text-coffee-500">Estamos preparando tu café de especialidad</p>
+      <div className="min-h-screen flex items-center justify-center bg-cream-50 px-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <MessageCircle className="w-10 h-10 text-green-600" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-coffee-900 mb-3">
+            ¡Pedido enviado!
+          </h2>
+          <p className="text-coffee-600 mb-2">
+            Tu pedido se ha abierto en WhatsApp.
+          </p>
+          <p className="text-sm text-coffee-400 mb-8">
+            Presiona enviar en WhatsApp para completar tu pedido. Te responderemos lo antes posible.
+          </p>
+          <button
+            onClick={onBack}
+            className="px-8 py-3.5 bg-coffee-800 hover:bg-coffee-900 text-white font-semibold rounded-full transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
+          >
+            Volver a la tienda
+          </button>
         </div>
       </div>
     );
@@ -64,201 +99,116 @@ export default function Checkout({ onBack, onComplete }: CheckoutProps) {
           <span className="text-sm font-medium">Volver a la tienda</span>
         </button>
 
-        {/* Progress steps */}
-        <div className="flex items-center justify-center mb-10">
-          <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              step >= 1 ? "bg-coffee-800 text-white" : "bg-coffee-100 text-coffee-400"
-            }`}>
-              <Truck className="w-4 h-4" />
-              <span className="hidden sm:inline">Envío</span>
-            </div>
-            <div className="w-8 h-0.5 bg-coffee-200">
-              <div className={`h-full bg-coffee-700 transition-all duration-500 ${step >= 2 ? "w-full" : "w-0"}`} />
-            </div>
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              step >= 2 ? "bg-coffee-800 text-white" : "bg-coffee-100 text-coffee-400"
-            }`}>
-              <CreditCard className="w-4 h-4" />
-              <span className="hidden sm:inline">Pago</span>
-            </div>
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-medium mb-4">
+            <MessageCircle className="w-4 h-4" />
+            Pedido vía WhatsApp
           </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-coffee-900 mb-2">
+            Finaliza tu pedido
+          </h1>
+          <p className="text-coffee-500 text-sm sm:text-base">
+            Completa tus datos y te enviaremos el pedido por WhatsApp
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Form */}
           <div className="lg:col-span-3">
-            <form onSubmit={handleSubmit}>
-              {step === 1 && (
-                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-coffee-100/60">
-                  <h2 className="text-xl font-bold text-coffee-900 mb-6">Información de envío</h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                        Nombre completo
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        placeholder="Juan García"
-                        className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        placeholder="juan@email.com"
-                        className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                        Dirección
-                      </label>
-                      <input
-                        type="text"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        required
-                        placeholder="Calle del Café 123, 2ºB"
-                        className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                          Ciudad
-                        </label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={formData.city}
-                          onChange={handleChange}
-                          required
-                          placeholder="Madrid"
-                          className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                          Código postal
-                        </label>
-                        <input
-                          type="text"
-                          name="zip"
-                          value={formData.zip}
-                          onChange={handleChange}
-                          required
-                          placeholder="28001"
-                          className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                        />
-                      </div>
-                    </div>
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-coffee-100/60">
+              <h2 className="text-lg font-bold text-coffee-900 mb-6 flex items-center gap-2">
+                <User className="w-5 h-5 text-coffee-500" />
+                Tus datos
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
+                    Nombre completo *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coffee-400" />
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      placeholder="Juan García"
+                      className="w-full pl-10 pr-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400 transition-all"
+                    />
                   </div>
-                  <button
-                    type="submit"
-                    className="w-full mt-6 py-3.5 bg-coffee-800 hover:bg-coffee-900 text-white font-semibold rounded-full transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
-                  >
-                    Continuar al pago
-                  </button>
                 </div>
-              )}
+                <div>
+                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
+                    Teléfono *
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coffee-400" />
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                      placeholder="+34 612 345 678"
+                      className="w-full pl-10 pr-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400 transition-all"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
+                    Dirección de entrega *
+                  </label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-coffee-400" />
+                    <textarea
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      required
+                      placeholder="Calle, número, piso, ciudad, código postal"
+                      rows={3}
+                      className="w-full pl-10 pr-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400 transition-all resize-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
+                    Notas adicionales (opcional)
+                  </label>
+                  <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleChange}
+                    placeholder="Instrucciones especiales, horario preferido de entrega..."
+                    rows={2}
+                    className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400 transition-all resize-none"
+                  />
+                </div>
+              </div>
 
-              {step === 2 && (
-                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-coffee-100/60">
-                  <div className="flex items-center gap-2 mb-6">
-                    <Lock className="w-4 h-4 text-green-600" />
-                    <h2 className="text-xl font-bold text-coffee-900">Pago seguro</h2>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                        Número de tarjeta
-                      </label>
-                      <input
-                        type="text"
-                        name="cardNumber"
-                        value={formData.cardNumber}
-                        onChange={handleChange}
-                        required
-                        placeholder="4242 4242 4242 4242"
-                        maxLength={19}
-                        className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                          Fecha de expiración
-                        </label>
-                        <input
-                          type="text"
-                          name="cardExpiry"
-                          value={formData.cardExpiry}
-                          onChange={handleChange}
-                          required
-                          placeholder="MM/AA"
-                          maxLength={5}
-                          className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                          CVC
-                        </label>
-                        <input
-                          type="text"
-                          name="cardCvc"
-                          value={formData.cardCvc}
-                          onChange={handleChange}
-                          required
-                          placeholder="123"
-                          maxLength={4}
-                          className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3 mt-6">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="px-6 py-3.5 border border-coffee-200 text-coffee-700 font-medium rounded-full hover:bg-coffee-50 transition-all"
-                    >
-                      Atrás
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 py-3.5 bg-coffee-800 hover:bg-coffee-900 text-white font-semibold rounded-full transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
-                    >
-                      Pagar €{totalPrice.toFixed(2)}
-                    </button>
-                  </div>
-                  <p className="text-xs text-coffee-400 text-center mt-4 flex items-center justify-center gap-1">
-                    <Lock className="w-3 h-3" />
-                    Pago simulado — no se realizará ningún cargo
-                  </p>
-                </div>
-              )}
+              <button
+                type="submit"
+                className="w-full mt-6 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Enviar pedido por WhatsApp
+              </button>
+              <p className="text-xs text-coffee-400 text-center mt-3">
+                Se abrirá WhatsApp con tu pedido prellenado
+              </p>
             </form>
           </div>
 
           {/* Order Summary */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-coffee-100/60 sticky top-24">
-              <h3 className="font-bold text-coffee-900 mb-4">Resumen del pedido</h3>
-              <div className="space-y-3 mb-4">
+              <h3 className="font-bold text-coffee-900 mb-4 flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-coffee-500" />
+                Tu pedido
+              </h3>
+              <div className="space-y-3 mb-4 max-h-80 overflow-y-auto scrollbar-hide">
                 {items.map((item) => (
                   <div key={item.product.id} className="flex items-center gap-3">
                     <img
@@ -270,7 +220,9 @@ export default function Checkout({ onBack, onComplete }: CheckoutProps) {
                       <p className="text-sm font-medium text-coffee-800 truncate">
                         {item.product.name}
                       </p>
-                      <p className="text-xs text-coffee-500">x{item.quantity}</p>
+                      <p className="text-xs text-coffee-500">
+                        {item.quantity} × €{item.product.price.toFixed(2)}
+                      </p>
                     </div>
                     <span className="text-sm font-semibold text-coffee-900">
                       €{(item.product.price * item.quantity).toFixed(2)}
@@ -285,7 +237,7 @@ export default function Checkout({ onBack, onComplete }: CheckoutProps) {
                 </div>
                 <div className="flex justify-between text-sm text-coffee-600">
                   <span>Envío</span>
-                  <span className="text-green-600 font-medium">Gratis</span>
+                  <span className="text-green-600 font-medium">A coordinar</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-coffee-900 pt-2 border-t border-coffee-100">
                   <span>Total</span>
@@ -295,39 +247,6 @@ export default function Checkout({ onBack, onComplete }: CheckoutProps) {
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-export function OrderConfirmation({ onBackToShop }: { onBackToShop: () => void }) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-cream-50 px-4">
-      <div className="text-center max-w-md">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Check className="w-10 h-10 text-green-600" />
-        </div>
-        <h2 className="text-2xl sm:text-3xl font-bold text-coffee-900 mb-3">
-          ¡Pedido confirmado!
-        </h2>
-        <p className="text-coffee-600 mb-2">
-          Tu café de especialidad está en camino.
-        </p>
-        <p className="text-sm text-coffee-400 mb-8">
-          Recibirás un email con los detalles del seguimiento.
-        </p>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-coffee-100/60 mb-8">
-          <p className="text-xs text-coffee-500 uppercase tracking-wider mb-2">Número de pedido</p>
-          <p className="text-lg font-mono font-bold text-coffee-800">
-            #ORC-{Math.random().toString(36).substring(2, 8).toUpperCase()}
-          </p>
-        </div>
-        <button
-          onClick={onBackToShop}
-          className="px-8 py-3.5 bg-coffee-800 hover:bg-coffee-900 text-white font-semibold rounded-full transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
-        >
-          Volver a la tienda
-        </button>
       </div>
     </div>
   );
