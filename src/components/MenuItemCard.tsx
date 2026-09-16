@@ -73,7 +73,7 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
         <p className={`text-[9px] sm:text-[10px] md:text-xs mb-1.5 sm:mb-2 truncate ${
           isOutOfStock ? "text-gray-400" : "text-tomato-500"
         }`}>
-          {item.category}
+          {item.quantity} unidades
         </p>
         <p className={`text-[9px] sm:text-xs line-clamp-2 mb-2 sm:mb-3 flex-1 hidden sm:block ${
           isOutOfStock ? "text-gray-400" : "text-tomato-600/70"

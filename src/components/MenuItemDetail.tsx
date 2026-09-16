@@ -71,7 +71,7 @@ export default function MenuItemDetail({ item, onClose }: MenuItemDetailProps) {
               <span className={`text-[10px] sm:text-xs font-medium uppercase tracking-wider ${
                 isOutOfStock ? "text-gray-400" : "text-tomato-500"
               }`}>
-                {item.category}
+                {item.quantity} unidades
               </span>
             </div>
 
@@ -92,8 +92,8 @@ export default function MenuItemDetail({ item, onClose }: MenuItemDetailProps) {
               <div className="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-cream-50 rounded-lg sm:rounded-xl">
                 <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tomato-500" />
                 <div>
-                  <p className="text-[9px] sm:text-[10px] text-tomato-400 uppercase tracking-wider">Unidad</p>
-                  <p className="text-[10px] sm:text-xs font-semibold text-tomato-700">{item.unit}</p>
+                  <p className="text-[9px] sm:text-[10px] text-tomato-400 uppercase tracking-wider">Cantidad</p>
+                  <p className="text-[10px] sm:text-xs font-semibold text-tomato-700">{item.quantity} unidades</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-cream-50 rounded-lg sm:rounded-xl">
