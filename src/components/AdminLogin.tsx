@@ -107,15 +107,6 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
               )}
             </button>
           </form>
-
-          <div className="mt-6 p-3 bg-cream-50 rounded-xl border border-cream-200">
-            <p className="text-xs text-tomato-600 text-center">
-              <span className="font-bold">Demo:</span> usuario{" "}
-              <code className="px-1.5 py-0.5 bg-white rounded text-tomato-800">admin</code>{" "}
-              / contraseña{" "}
-              <code className="px-1.5 py-0.5 bg-white rounded text-tomato-800">admin123</code>
-            </p>
-          </div>
         </div>
       </div>
     </div>
