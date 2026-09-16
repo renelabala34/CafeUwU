@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, Menu, X, Shield, MapPin, Clock } from "lucide-react";
+import { Search, ShoppingCart, X, Shield, MapPin, Clock } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
 import { businessInfo } from "../data/menu";
@@ -70,11 +70,12 @@ export default function Header({ onCartClick, onAdminClick, searchQuery, onSearc
             <button
               className="md:hidden p-2.5 rounded-full hover:bg-tomato-50 transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Buscar"
             >
               {mobileMenuOpen ? (
                 <X className="w-5 h-5 text-tomato-700" />
               ) : (
-                <Menu className="w-5 h-5 text-tomato-700" />
+                <Search className="w-5 h-5 text-tomato-700" />
               )}
             </button>
           </div>
