@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, MessageCircle, ShoppingBag, MapPin, User, Phone, Clock, Info } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { businessInfo } from "../data/menu";
+import TermsModal from "./TermsModal";
 
 interface CheckoutProps {
   onBack: () => void;
@@ -18,6 +19,9 @@ export default function Checkout({ onBack }: CheckoutProps) {
     notes: "",
   });
   const [sent, setSent] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [termsError, setTermsError] = useState(false);
 
   const deliveryFee = totalPrice > 0 ? businessInfo.delivery_fee : 0;
   const grandTotal = totalPrice + deliveryFee;
@@ -60,6 +64,13 @@ export default function Checkout({ onBack }: CheckoutProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar que aceptó las reglas de servicio
+    if (!acceptedTerms) {
+      setTermsError(true);
+      return;
+    }
+    
     const message = buildWhatsAppMessage();
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
@@ -179,9 +190,42 @@ export default function Checkout({ onBack }: CheckoutProps) {
                 </div>
               </div>
 
+              {/* Checkbox de aceptación de reglas */}
+              <div className="mt-6 p-4 bg-cream-50 rounded-xl border border-tomato-100/60">
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => {
+                      setAcceptedTerms(e.target.checked);
+                      if (e.target.checked) {
+                        setTermsError(false);
+                      }
+                    }}
+                    className="mt-0.5 w-5 h-5 rounded border-2 border-tomato-300 text-tomato-600 focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all cursor-pointer"
+                  />
+                  <span className="text-sm text-tomato-700 leading-relaxed">
+                    He leído y acepto las{" "}
+                    <button
+                      type="button"
+                      onClick={() => setShowTerms(true)}
+                      className="font-bold text-tomato-600 hover:text-tomato-800 underline decoration-dotted underline-offset-2 transition-colors"
+                    >
+                      reglas de servicio
+                    </button>
+                    {" "}de I'MAS
+                  </span>
+                </label>
+                {termsError && (
+                  <p className="mt-2 text-xs text-red-600 font-medium">
+                    ⚠️ Debes aceptar las reglas de servicio para continuar
+                  </p>
+                )}
+              </div>
+
               <button
                 type="submit"
-                className="w-full mt-6 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full mt-4 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-5 h-5" />
                 Enviar pedido por WhatsApp
@@ -241,6 +285,9 @@ export default function Checkout({ onBack }: CheckoutProps) {
           </div>
         </div>
       </div>
+
+      {/* Modal de reglas de servicio */}
+      <TermsModal isOpen={showTerms} onClose={() => setShowTerms(false)} />
     </div>
   );
 }
