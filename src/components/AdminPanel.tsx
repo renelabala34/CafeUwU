@@ -12,7 +12,7 @@ interface AdminPanelProps {
 
 const SECTIONS = [
   { value: "sin_freir", label: "Ofertas sin freír" },
-  { value: "preparado", label: "Especial ¡MAS! — Preparados" },
+  { value: "preparado", label: "Especial I'MAS — Preparados" },
 ];
 
 const EMOJIS = ["🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", "🍖", "🥩", "🍕", "🌮"];

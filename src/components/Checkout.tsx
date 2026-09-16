@@ -28,7 +28,7 @@ export default function Checkout({ onBack }: CheckoutProps) {
 
   const buildWhatsAppMessage = () => {
     const lines: string[] = [];
-    lines.push("🛒 *Nuevo Pedido — ¡MAS!*");
+    lines.push("🛒 *Nuevo Pedido — I'MAS*");
     lines.push("");
     lines.push("👤 *Cliente:* " + formData.name);
     lines.push("📱 *Teléfono:* " + formData.phone);

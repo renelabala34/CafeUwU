@@ -21,11 +21,11 @@ export default function Header({ onCartClick, onAdminClick, searchQuery, onSearc
           {/* Logo */}
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-tomato-500 to-warm-500 flex items-center justify-center shadow-lg shadow-tomato-500/20">
-              <span className="text-white font-black text-lg sm:text-xl">!</span>
+              <span className="text-white font-black text-sm sm:text-base">I'M</span>
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-tomato-700 tracking-tight">
-                ¡MAS!
+                I'MAS
               </h1>
               <p className="text-[10px] sm:text-xs text-warm-600 -mt-0.5 font-medium">
                 {businessInfo.tagline}

@@ -18,10 +18,10 @@ export const sections = [
 ];
 
 export const businessInfo = {
-  name: "¡MAS!",
+  name: "I'MAS",
   tagline: "Lo que necesitas...",
   social: "@I'MAS",
-  address: "Alamar Z12",
+  address: "Alamar zona 12",
   delivery_zone: "Alamar",
   delivery_fee: 200,
   currency: "CUP",

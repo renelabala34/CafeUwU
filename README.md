@@ -1,6 +1,6 @@
-# ¡MAS! - Tienda de Comida Casera
+# I'MAS - Tienda de Comida Casera
 
-Tienda online de comida casera cubana con entrega en Alamar.
+Tienda online de comida casera cubana con entrega en Alamar zona 12.
 
 ## 🍽️ Productos
 
@@ -11,7 +11,7 @@ Tienda online de comida casera cubana con entrega en Alamar.
 - Bolitas (queso, jamón)
 - Yuca rellena (picadillo, salchicha)
 
-### Especial ¡MAS! — Preparados
+### Especial I'MAS — Preparados
 - Tamales (picadillo, pollo, lomo ahumado)
 - Banana'MAS (picadillo, picadillo con queso)
 - Salchirollos
@@ -24,7 +24,7 @@ Tienda online de comida casera cubana con entrega en Alamar.
 - ✅ Panel de administración (usuario: `admin`, contraseña: `admin123`)
 - ✅ Gestión completa de productos (crear, editar, eliminar)
 - ✅ Persistencia en localStorage
-- ✅ Diseño responsive (móvil y escritorio)
+- ✅ Diseño responsive optimizado (móvil y escritorio)
 - ✅ Información de negocio (horarios, zona de entrega, políticas de pago)
 
 ## 💻 Desarrollo
@@ -50,7 +50,7 @@ npm run build
 
 ## 📱 Contacto
 
-- **Dirección:** Alamar Z12
+- **Dirección:** Alamar zona 12
 - **Teléfono:** +53 5680 3949
 - **Instagram:** @I'MAS
 - **Horario:** 07:00 - 19:00
