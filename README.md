@@ -64,4 +64,11 @@ npm run build
 ## 🔐 Acceso Admin
 
 - Usuario: `admin`
-- Contraseña: `admin123`
+- Contraseña inicial: `admin123`
+- **Importante**: Cambia la contraseña después del primer login desde el panel de administración
+
+### Seguridad
+
+- Las contraseñas se almacenan con hash SHA-256 + salt
+- El sistema valida fortaleza de contraseña (mínimo 8 caracteres, mayúsculas, minúsculas, números y caracteres especiales)
+- Puedes cambiar tu contraseña en cualquier momento desde el panel de administración

@@ -43,10 +43,18 @@
 6. Haz clic en **"Run"** (o presiona `Ctrl+Enter`)
 7. Deberías ver: **"Success. No rows returned"**
 
-### 2.2 Verificar que se creó la tabla
+### 2.2 Verificar que se crearon las tablas
 1. Ve a **"Table Editor"** (ícono de tabla en el menú lateral)
-2. Deberías ver la tabla `menu_items`
-3. Haz clic en ella para ver los 20 productos iniciales
+2. Deberías ver **dos tablas**:
+   - `menu_items` - con los 20 productos iniciales
+   - `admin_credentials` - con las credenciales de administrador
+3. Haz clic en `menu_items` para ver los 20 productos iniciales
+4. Haz clic en `admin_credentials` para ver el usuario admin inicial
+
+### 2.3 Credenciales de administrador
+- **Usuario**: `admin`
+- **Contraseña inicial**: `admin123`
+- ⚠️ **IMPORTANTE**: Cambia la contraseña después del primer login desde el panel de administración
 
 ---
 

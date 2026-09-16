@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useMenu } from "../context/MenuContext";
 import { MenuItem } from "../data/menu";
 import {
-  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save,
+  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save, Key,
 } from "lucide-react";
+import ChangePassword from "./ChangePassword";
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -48,6 +49,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<ItemForm>(emptyForm);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const filtered = items.filter(
     (i) =>
@@ -133,13 +135,23 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 <p className="text-xs text-tomato-500">Gestión del menú</p>
               </div>
             </div>
-            <button
-              onClick={onLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-tomato-600 hover:text-tomato-800 hover:bg-tomato-50 rounded-full transition-all"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Salir</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowChangePassword(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-tomato-600 hover:text-tomato-800 hover:bg-tomato-50 rounded-full transition-all"
+                title="Cambiar contraseña"
+              >
+                <Key className="w-4 h-4" />
+                <span className="hidden sm:inline">Contraseña</span>
+              </button>
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-tomato-600 hover:text-tomato-800 hover:bg-tomato-50 rounded-full transition-all"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Salir</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -405,6 +417,11 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </div>
           </div>
         </div>
+      )}
+
+      {/* Change Password Modal */}
+      {showChangePassword && (
+        <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}
     </div>
   );
