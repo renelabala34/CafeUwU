@@ -87,6 +87,7 @@ function ShopContent() {
     <div className="min-h-screen bg-cream-50">
       <Header
         onCartClick={() => setCartOpen(true)}
+        onAdminClick={() => setPage("admin-login")}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
@@ -230,10 +231,10 @@ function ShopContent() {
               </ul>
               <button
                 onClick={() => setPage("admin-login")}
-                className="mt-4 flex items-center gap-1.5 text-xs text-cream-400/50 hover:text-cream-200 transition-colors"
+                className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cream-300/80 hover:text-cream-100 bg-cream-800/30 hover:bg-cream-800/50 rounded-full transition-all"
               >
                 <Shield className="w-3 h-3" />
-                Admin
+                Panel Admin
               </button>
             </div>
           </div>

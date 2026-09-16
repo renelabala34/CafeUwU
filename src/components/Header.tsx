@@ -1,14 +1,15 @@
-import { Search, ShoppingCart, Coffee, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, Coffee, Menu, X, Shield } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
 
 interface HeaderProps {
   onCartClick: () => void;
+  onAdminClick: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
 }
 
-export default function Header({ onCartClick, searchQuery, onSearchChange }: HeaderProps) {
+export default function Header({ onCartClick, onAdminClick, searchQuery, onSearchChange }: HeaderProps) {
   const { totalItems } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -47,6 +48,13 @@ export default function Header({ onCartClick, searchQuery, onSearchChange }: Hea
 
           {/* Actions */}
           <div className="flex items-center gap-2 sm:gap-4">
+            <button
+              onClick={onAdminClick}
+              className="p-2.5 rounded-full hover:bg-coffee-100 transition-colors group"
+              title="Panel de administración"
+            >
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-coffee-700 group-hover:text-coffee-900 transition-colors" />
+            </button>
             <button
               onClick={onCartClick}
               className="relative p-2.5 rounded-full hover:bg-coffee-100 transition-colors group"
