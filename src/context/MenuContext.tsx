@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { initialMenu, MenuItem } from "../data/menu";
+import { supabase } from "../lib/supabase";
 
 interface MenuContextType {
   items: MenuItem[];
@@ -12,44 +13,181 @@ interface MenuContextType {
 
 const MenuContext = createContext<MenuContextType | undefined>(undefined);
 
-export function MenuProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<MenuItem[]>(() => {
-    const stored = localStorage.getItem("imas_menu");
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return initialMenu;
-      }
-    }
-    return initialMenu;
-  });
-  const [loading, setLoading] = useState(false);
+// Función para convertir de formato DB a formato app
+const dbToMenuItem = (row: any): MenuItem => ({
+  id: row.id,
+  name: row.name,
+  section: row.section,
+  category: row.category,
+  price: row.price,
+  unit: row.unit,
+  type: row.type,
+  description: row.description,
+  emoji: row.emoji,
+  inStock: row.in_stock,
+});
 
+// Función para convertir de formato app a formato DB
+const menuItemToDb = (item: Partial<MenuItem>) => ({
+  name: item.name,
+  section: item.section,
+  category: item.category,
+  price: item.price,
+  unit: item.unit,
+  type: item.type,
+  description: item.description,
+  emoji: item.emoji,
+  in_stock: item.inStock,
+});
+
+export function MenuProvider({ children }: { children: ReactNode }) {
+  const [items, setItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Cargar items desde Supabase o localStorage
   useEffect(() => {
-    localStorage.setItem("imas_menu", JSON.stringify(items));
+    const loadItems = async () => {
+      if (supabase) {
+        try {
+          const { data, error } = await supabase
+            .from('menu_items')
+            .select('*')
+            .order('id', { ascending: true });
+
+          if (error) throw error;
+
+          if (data && data.length > 0) {
+            setItems(data.map(dbToMenuItem));
+          } else {
+            // Si no hay datos en Supabase, usar datos iniciales
+            setItems(initialMenu);
+          }
+        } catch (error) {
+          console.error('Error loading from Supabase:', error);
+          // Fallback a localStorage
+          const stored = localStorage.getItem("imas_menu");
+          if (stored) {
+            try {
+              setItems(JSON.parse(stored));
+            } catch {
+              setItems(initialMenu);
+            }
+          } else {
+            setItems(initialMenu);
+          }
+        }
+      } else {
+        // Sin Supabase, usar localStorage
+        const stored = localStorage.getItem("imas_menu");
+        if (stored) {
+          try {
+            setItems(JSON.parse(stored));
+          } catch {
+            setItems(initialMenu);
+          }
+        } else {
+          setItems(initialMenu);
+        }
+      }
+      setLoading(false);
+    };
+
+    loadItems();
+  }, []);
+
+  // Sincronizar con localStorage cuando cambien los items
+  useEffect(() => {
+    if (!supabase) {
+      localStorage.setItem("imas_menu", JSON.stringify(items));
+    }
   }, [items]);
 
   const addItem = async (item: Omit<MenuItem, "id">) => {
-    const newId = Math.max(...items.map((i) => i.id), 0) + 1;
-    setItems((prev) => [...prev, { ...item, id: newId }]);
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('menu_items')
+          .insert([menuItemToDb(item)])
+          .select()
+          .single();
+
+        if (error) throw error;
+        setItems((prev) => [...prev, dbToMenuItem(data)]);
+      } catch (error) {
+        console.error('Error adding item:', error);
+        // Fallback local
+        const newId = Math.max(...items.map((i) => i.id), 0) + 1;
+        setItems((prev) => [...prev, { ...item, id: newId }]);
+      }
+    } else {
+      const newId = Math.max(...items.map((i) => i.id), 0) + 1;
+      setItems((prev) => [...prev, { ...item, id: newId }]);
+    }
   };
 
   const updateItem = async (id: number, updates: Partial<MenuItem>) => {
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...updates } : i)));
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('menu_items')
+          .update(menuItemToDb(updates))
+          .eq('id', id);
+
+        if (error) throw error;
+        setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...updates } : i)));
+      } catch (error) {
+        console.error('Error updating item:', error);
+        // Fallback local
+        setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...updates } : i)));
+      }
+    } else {
+      setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...updates } : i)));
+    }
   };
 
   const deleteItem = async (id: number) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('menu_items')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        setItems((prev) => prev.filter((i) => i.id !== id));
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        // Fallback local
+        setItems((prev) => prev.filter((i) => i.id !== id));
+      }
+    } else {
+      setItems((prev) => prev.filter((i) => i.id !== id));
+    }
   };
 
   const refreshItems = async () => {
-    const stored = localStorage.getItem("imas_menu");
-    if (stored) {
+    if (supabase) {
       try {
-        setItems(JSON.parse(stored));
-      } catch {
-        setItems(initialMenu);
+        const { data, error } = await supabase
+          .from('menu_items')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (error) throw error;
+        if (data) {
+          setItems(data.map(dbToMenuItem));
+        }
+      } catch (error) {
+        console.error('Error refreshing items:', error);
+      }
+    } else {
+      const stored = localStorage.getItem("imas_menu");
+      if (stored) {
+        try {
+          setItems(JSON.parse(stored));
+        } catch {
+          setItems(initialMenu);
+        }
       }
     }
   };
