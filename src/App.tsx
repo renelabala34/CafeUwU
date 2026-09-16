@@ -9,6 +9,7 @@ import CartDrawer from "./components/CartDrawer";
 import Checkout from "./components/Checkout";
 import AdminLogin from "./components/AdminLogin";
 import AdminPanel from "./components/AdminPanel";
+import TermsSection from "./components/TermsSection";
 import { SlidersHorizontal, MapPin, Clock, Phone, Instagram, Flame, Leaf } from "lucide-react";
 
 type Page = "shop" | "checkout" | "admin-login" | "admin-panel";
@@ -204,6 +205,9 @@ function ShopContent() {
         )}
       </main>
 
+      {/* Terms Section */}
+      <TermsSection />
+
       {/* Footer */}
       <footer className="bg-tomato-900 text-cream-100 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -219,7 +223,7 @@ function ShopContent() {
                 </div>
               </div>
               <p className="text-sm text-cream-300/70 leading-relaxed">
-                Comida casera cubana en Alamar. Croquetas, medallones, tamales y más.
+                Comida casera cubana de calidad y exclusividad en Alamar zona 12.
               </p>
             </div>
             <div>
@@ -227,9 +231,6 @@ function ShopContent() {
               <ul className="space-y-2 text-sm text-cream-300/70">
                 <li className="flex items-center gap-2">
                   <MapPin className="w-3.5 h-3.5 shrink-0" /> {businessInfo.address}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 shrink-0" /> {businessInfo.order_hours.open} - {businessInfo.order_hours.close}
                 </li>
                 <li className="flex items-center gap-2">
                   <Phone className="w-3.5 h-3.5 shrink-0" /> +53 5680 3949
@@ -240,12 +241,9 @@ function ShopContent() {
               </ul>
             </div>
             <div>
-              <h4 className="font-black text-white mb-3 text-sm">Pago y entrega</h4>
+              <h4 className="font-black text-white mb-3 text-sm">Información</h4>
               <p className="text-sm text-cream-300/70 leading-relaxed mb-3">
-                {businessInfo.payment_policy}
-              </p>
-              <p className="text-xs text-cream-400/50 mb-4">
-                Envío: ${businessInfo.delivery_fee} CUP · Zona: {businessInfo.delivery_zone}
+                Consulta nuestras reglas de servicio para más detalles sobre pedidos, pagos y entregas.
               </p>
               <button
                 onClick={() => setPage("admin-login")}

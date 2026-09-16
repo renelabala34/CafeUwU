@@ -50,7 +50,9 @@ export default function Checkout({ onBack }: CheckoutProps) {
     lines.push(`Envío: $${deliveryFee} CUP`);
     lines.push(`💰 *TOTAL: $${grandTotal} CUP*`);
     lines.push("");
-    lines.push("💳 *Pago:* " + businessInfo.payment_policy);
+    lines.push("💳 *Método de Pago:*");
+    lines.push("• Producto: 50% transferencia + 50% efectivo");
+    lines.push("• Mensajería: $200 CUP (solo efectivo)");
     lines.push("");
     lines.push("¡Gracias por tu pedido! 🍽️");
     return lines.join("\n");
@@ -225,14 +227,15 @@ export default function Checkout({ onBack }: CheckoutProps) {
                 <div className="flex items-start gap-2">
                   <Info className="w-4 h-4 text-warm-700 shrink-0 mt-0.5" />
                   <div className="text-xs text-warm-800 leading-relaxed">
-                    <p className="font-bold mb-1">Política de pago:</p>
-                    <p>{businessInfo.payment_policy}</p>
+                    <p className="font-bold mb-1">Método de pago:</p>
+                    <p className="mb-1">• Producto: 50% transferencia + 50% efectivo</p>
+                    <p>• Mensajería: $200 CUP (solo efectivo)</p>
                   </div>
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2 text-xs text-tomato-500">
                 <Clock className="w-3.5 h-3.5" />
-                <span>Entrega estimada: {businessInfo.lead_time_hours}h</span>
+                <span>Entrega: 24 horas de antelación</span>
               </div>
             </div>
           </div>

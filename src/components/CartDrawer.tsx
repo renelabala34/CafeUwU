@@ -104,7 +104,7 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
               </div>
             </div>
             <p className="text-[10px] text-tomato-500 text-center leading-relaxed">
-              💳 {businessInfo.payment_policy}
+              💳 50% transferencia + 50% efectivo · Mensajería: $200 CUP
             </p>
             <button
               onClick={onCheckout}
