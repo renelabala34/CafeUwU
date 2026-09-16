@@ -3,6 +3,57 @@
 -- Ejecutar en: SQL Editor de Supabase
 -- ============================================
 
+-- Crear tabla de credenciales de administrador
+CREATE TABLE IF NOT EXISTS admin_credentials (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  salt TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Insertar credenciales iniciales (admin/admin123)
+-- Password hash generado con SHA-256 + salt
+INSERT INTO admin_credentials (username, password_hash, salt) 
+VALUES (
+  'admin',
+  '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+  'default_salt_for_initial_setup'
+)
+ON CONFLICT (username) DO NOTHING;
+
+-- Trigger para actualizar updated_at automáticamente
+CREATE OR REPLACE FUNCTION update_admin_credentials_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS update_admin_credentials_updated_at ON admin_credentials;
+CREATE TRIGGER update_admin_credentials_updated_at
+  BEFORE UPDATE ON admin_credentials
+  FOR EACH ROW
+  EXECUTE FUNCTION update_admin_credentials_updated_at();
+
+-- Políticas de seguridad para admin_credentials
+ALTER TABLE admin_credentials ENABLE ROW LEVEL SECURITY;
+
+-- Solo lectura pública (necesario para login)
+DROP POLICY IF EXISTS "Admin credentials readable for login" ON admin_credentials;
+CREATE POLICY "Admin credentials readable for login"
+  ON admin_credentials FOR SELECT
+  USING (true);
+
+-- Solo escritura para autenticados (cambio de contraseña)
+DROP POLICY IF EXISTS "Admin credentials writable" ON admin_credentials;
+CREATE POLICY "Admin credentials writable"
+  ON admin_credentials FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
 -- Crear tabla de productos del menú
 CREATE TABLE IF NOT EXISTS menu_items (
   id SERIAL PRIMARY KEY,

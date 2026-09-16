@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Lock, ArrowLeft, Shield } from "lucide-react";
+import { supabase } from "../lib/supabase";
+import { verifyPassword } from "../lib/security";
 
 interface AdminLoginProps {
   onLogin: () => void;
   onBack: () => void;
 }
-
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "admin123";
 
 export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
   const [username, setUsername] = useState("");
@@ -15,20 +14,55 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    setTimeout(() => {
-      if (username === ADMIN_USER && password === ADMIN_PASS) {
+    try {
+      if (!supabase) {
+        // Fallback: credenciales por defecto si Supabase no está configurado
+        if (username === "admin" && password === "admin123") {
+          sessionStorage.setItem("admin_auth", "true");
+          onLogin();
+        } else {
+          setError("Usuario o contraseña incorrectos");
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Obtener credenciales de la base de datos
+      const { data: credentials, error: fetchError } = await supabase
+        .from("admin_credentials")
+        .select("*")
+        .eq("username", username)
+        .single();
+
+      if (fetchError || !credentials) {
+        setError("Usuario o contraseña incorrectos");
+        setLoading(false);
+        return;
+      }
+
+      // Verificar contraseña
+      const isValid = await verifyPassword(
+        password,
+        credentials.password_hash,
+        credentials.salt
+      );
+
+      if (isValid) {
         sessionStorage.setItem("admin_auth", "true");
         onLogin();
       } else {
         setError("Usuario o contraseña incorrectos");
       }
+    } catch (err) {
+      setError("Error al iniciar sesión. Intenta de nuevo.");
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (
