@@ -12,8 +12,10 @@ export default function MenuItemDetail({ item, onClose }: MenuItemDetailProps) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const isOutOfStock = !item.inStock;
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     for (let i = 0; i < quantity; i++) {
       addToCart(item);
     }
@@ -40,28 +42,48 @@ export default function MenuItemDetail({ item, onClose }: MenuItemDetailProps) {
 
         <div className="grid md:grid-cols-2 gap-0">
           {/* Visual */}
-          <div className="relative aspect-square md:aspect-auto md:h-full bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center">
-            <span className="text-8xl sm:text-9xl">{item.emoji}</span>
-            <div className="absolute bottom-4 left-4">
+          <div className={`relative aspect-square md:aspect-auto md:h-full flex items-center justify-center ${
+            isOutOfStock 
+              ? "bg-gradient-to-br from-gray-100 to-gray-200" 
+              : "bg-gradient-to-br from-cream-100 to-warm-100"
+          }`}>
+            <span className={`text-8xl sm:text-9xl ${isOutOfStock ? "grayscale" : ""}`}>
+              {item.emoji}
+            </span>
+            <div className="absolute bottom-4 left-4 flex gap-2">
               <span className={`px-3 py-1.5 text-sm font-semibold rounded-full ${typeColor}`}>
                 {typeLabel}
               </span>
+              {isOutOfStock && (
+                <span className="px-3 py-1.5 text-sm font-bold rounded-full bg-red-600 text-white">
+                  AGOTADO
+                </span>
+              )}
             </div>
+            {isOutOfStock && (
+              <div className="absolute inset-0 bg-gray-900/20" />
+            )}
           </div>
 
           {/* Details */}
           <div className="p-6 sm:p-8 flex flex-col">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-medium text-tomato-500 uppercase tracking-wider">
+              <span className={`text-xs font-medium uppercase tracking-wider ${
+                isOutOfStock ? "text-gray-400" : "text-tomato-500"
+              }`}>
                 {item.category}
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black text-tomato-900 mb-3">
+            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${
+              isOutOfStock ? "text-gray-500" : "text-tomato-900"
+            }`}>
               {item.name}
             </h2>
 
-            <p className="text-sm text-tomato-700 leading-relaxed mb-6">
+            <p className={`text-sm leading-relaxed mb-6 ${
+              isOutOfStock ? "text-gray-400" : "text-tomato-700"
+            }`}>
               {item.description}
             </p>
 
@@ -101,38 +123,54 @@ export default function MenuItemDetail({ item, onClose }: MenuItemDetailProps) {
             <div className="mt-auto pt-4 border-t border-tomato-100">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <span className="text-3xl font-black text-tomato-700">${item.price}</span>
-                  <span className="text-sm text-tomato-500 ml-2">CUP</span>
+                  <span className={`text-3xl font-black ${
+                    isOutOfStock ? "text-gray-400" : "text-tomato-700"
+                  }`}>
+                    ${item.price}
+                  </span>
+                  <span className={`text-sm ml-2 ${
+                    isOutOfStock ? "text-gray-300" : "text-tomato-500"
+                  }`}>
+                    CUP
+                  </span>
                 </div>
 
-                <div className="flex items-center gap-2 bg-cream-100 rounded-full p-1">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white transition-colors"
-                  >
-                    <Minus className="w-3.5 h-3.5 text-tomato-600" />
-                  </button>
-                  <span className="w-8 text-center text-sm font-bold text-tomato-800">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white transition-colors"
-                  >
-                    <Plus className="w-3.5 h-3.5 text-tomato-600" />
-                  </button>
-                </div>
+                {!isOutOfStock && (
+                  <div className="flex items-center gap-2 bg-cream-100 rounded-full p-1">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white transition-colors"
+                    >
+                      <Minus className="w-3.5 h-3.5 text-tomato-600" />
+                    </button>
+                    <span className="w-8 text-center text-sm font-bold text-tomato-800">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-tomato-600" />
+                    </button>
+                  </div>
+                )}
               </div>
 
-              <button
-                onClick={handleAddToCart}
-                className={`w-full py-3.5 rounded-full font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300 active:scale-[0.98] ${
-                  added
-                    ? "bg-olive-600 text-white"
-                    : "bg-tomato-600 hover:bg-tomato-700 text-white hover:shadow-lg hover:shadow-tomato-600/20"
-                }`}
-              >
-                <ShoppingCart className="w-4 h-4" />
-                {added ? "¡Añadido!" : `Añadir — $${item.price * quantity} CUP`}
-              </button>
+              {isOutOfStock ? (
+                <div className="w-full py-3.5 rounded-full font-bold text-sm flex items-center justify-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed">
+                  Producto agotado
+                </div>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  className={`w-full py-3.5 rounded-full font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300 active:scale-[0.98] ${
+                    added
+                      ? "bg-olive-600 text-white"
+                      : "bg-tomato-600 hover:bg-tomato-700 text-white hover:shadow-lg hover:shadow-tomato-600/20"
+                  }`}
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  {added ? "¡Añadido!" : `Añadir — $${item.price * quantity} CUP`}
+                </button>
+              )}
             </div>
           </div>
         </div>
