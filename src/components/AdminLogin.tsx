@@ -32,62 +32,54 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-coffee-900 via-coffee-800 to-coffee-950 flex items-center justify-center px-4">
-      {/* Background decoration */}
+    <div className="min-h-screen bg-gradient-to-br from-tomato-800 via-tomato-700 to-warm-700 flex items-center justify-center px-4">
       <div className="absolute inset-0 overflow-hidden opacity-10">
-        <div className="absolute top-20 left-20 w-60 h-60 rounded-full bg-warm-400 blur-3xl" />
-        <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full bg-cream-400 blur-3xl" />
+        <div className="absolute top-20 left-20 w-60 h-60 rounded-full bg-cream-300 blur-3xl" />
+        <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full bg-warm-300 blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md">
-        {/* Back button */}
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-cream-200/70 hover:text-cream-100 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm">Volver a la tienda</span>
+          <span className="text-sm">Volver al menú</span>
         </button>
 
-        {/* Login card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-10">
-          {/* Icon */}
-          <div className="w-16 h-16 bg-coffee-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Shield className="w-8 h-8 text-coffee-700" />
+          <div className="w-16 h-16 bg-tomato-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-8 h-8 text-tomato-700" />
           </div>
 
-          <h1 className="text-2xl font-bold text-coffee-900 text-center mb-2">
+          <h1 className="text-2xl font-black text-tomato-900 text-center mb-2">
             Panel de Administración
           </h1>
-          <p className="text-sm text-coffee-500 text-center mb-8">
-            Inicia sesión para gestionar tus productos
+          <p className="text-sm text-tomato-600 text-center mb-8">
+            Inicia sesión para gestionar el menú
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                Usuario
-              </label>
+              <label className="block text-sm font-bold text-tomato-800 mb-1.5">Usuario</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 placeholder="admin"
-                className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
+                className="w-full px-4 py-3 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                Contraseña
-              </label>
+              <label className="block text-sm font-bold text-tomato-800 mb-1.5">Contraseña</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
+                className="w-full px-4 py-3 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
               />
             </div>
 
@@ -100,7 +92,7 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-coffee-800 hover:bg-coffee-900 disabled:bg-coffee-400 text-white font-semibold rounded-full transition-all duration-200 hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-tomato-600 hover:bg-tomato-700 disabled:bg-tomato-300 text-white font-bold rounded-full transition-all duration-200 hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -117,11 +109,11 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
           </form>
 
           <div className="mt-6 p-3 bg-cream-50 rounded-xl border border-cream-200">
-            <p className="text-xs text-coffee-500 text-center">
-              <span className="font-semibold">Demo:</span> usuario{" "}
-              <code className="px-1.5 py-0.5 bg-white rounded text-coffee-700">admin</code>{" "}
+            <p className="text-xs text-tomato-600 text-center">
+              <span className="font-bold">Demo:</span> usuario{" "}
+              <code className="px-1.5 py-0.5 bg-white rounded text-tomato-800">admin</code>{" "}
               / contraseña{" "}
-              <code className="px-1.5 py-0.5 bg-white rounded text-coffee-700">admin123</code>
+              <code className="px-1.5 py-0.5 bg-white rounded text-tomato-800">admin123</code>
             </p>
           </div>
         </div>
