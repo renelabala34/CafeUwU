@@ -22,12 +22,16 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
         ? "border-gray-200 opacity-75 hover:opacity-90" 
         : "border-tomato-100/60 hover:-translate-y-1"
     }`}>
-      {/* Emoji / Visual */}
-      <div className={`relative aspect-square flex items-center justify-center ${
-        isOutOfStock 
-          ? "bg-gradient-to-br from-gray-100 to-gray-200" 
-          : "bg-gradient-to-br from-cream-100 to-warm-100"
-      }`}>
+      {/* Emoji / Visual - Clickable */}
+      <button
+        onClick={() => onViewDetail(item)}
+        disabled={isOutOfStock}
+        className={`relative aspect-square w-full flex items-center justify-center cursor-pointer ${
+          isOutOfStock 
+            ? "bg-gradient-to-br from-gray-100 to-gray-200 cursor-not-allowed" 
+            : "bg-gradient-to-br from-cream-100 to-warm-100 active:scale-95 transition-transform duration-150"
+        }`}
+      >
         <span className={`text-5xl sm:text-6xl md:text-7xl transition-transform duration-500 ${
           isOutOfStock ? "grayscale" : "group-hover:scale-110"
         }`}>
@@ -51,14 +55,13 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
           </div>
         )}
 
-        {/* Quick view */}
-        <button
-          onClick={() => onViewDetail(item)}
-          className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 p-2 sm:p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110"
-        >
-          <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tomato-700" />
-        </button>
-      </div>
+        {/* Quick view icon - solo visible en desktop al hacer hover */}
+        {!isOutOfStock && (
+          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 p-2 sm:p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tomato-700" />
+          </div>
+        )}
+      </button>
 
       {/* Content */}
       <div className="p-3 sm:p-4 md:p-5 flex flex-col flex-1">
