@@ -1,17 +1,8 @@
 import { useState } from "react";
-import { useProducts } from "../context/ProductContext";
-import { Product } from "../data/products";
+import { useMenu } from "../context/MenuContext";
+import { MenuItem } from "../data/menu";
 import {
-  Plus,
-  Edit2,
-  Trash2,
-  LogOut,
-  ArrowLeft,
-  Package,
-  Search,
-  X,
-  Save,
-  Image as ImageIcon,
+  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save,
 } from "lucide-react";
 
 interface AdminPanelProps {
@@ -19,114 +10,98 @@ interface AdminPanelProps {
   onBackToShop: () => void;
 }
 
-const CATEGORIES = ["Origen Único", "Blend", "Descafeinado", "Edición Especial"];
-const ROASTS = ["Ligero", "Medio", "Medio-Oscuro", "Oscuro"];
+const SECTIONS = [
+  { value: "sin_freir", label: "Ofertas sin freír" },
+  { value: "preparado", label: "Especial I'MAS — Preparados" },
+];
 
-interface ProductForm {
+const EMOJIS = ["🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", "🍖", "🥩", "🍕", "🌮"];
+
+interface ItemForm {
   name: string;
-  origin: string;
+  section: string;
   category: string;
-  roast: string;
   price: string;
-  weight: string;
+  unit: string;
+  type: "sin_freir" | "preparado";
   description: string;
-  flavorNotes: string;
-  altitude: string;
-  process: string;
-  image: string;
-  rating: string;
+  emoji: string;
   inStock: boolean;
 }
 
-const emptyForm: ProductForm = {
+const emptyForm: ItemForm = {
   name: "",
-  origin: "",
-  category: "Origen Único",
-  roast: "Medio",
+  section: "sin_freir",
+  category: "",
   price: "",
-  weight: "250g",
+  unit: "",
+  type: "sin_freir",
   description: "",
-  flavorNotes: "",
-  altitude: "",
-  process: "",
-  image: "",
-  rating: "4.5",
+  emoji: "🍗",
   inStock: true,
 };
 
 export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) {
-  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { items, addItem, updateItem, deleteItem } = useMenu();
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState<ProductForm>(emptyForm);
+  const [formData, setFormData] = useState<ItemForm>(emptyForm);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
-  const filteredProducts = products.filter(
-    (p) =>
+  const filtered = items.filter(
+    (i) =>
       searchQuery === "" ||
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.origin.toLowerCase().includes(searchQuery.toLowerCase())
+      i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      i.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const openCreateForm = () => {
-    setEditingProduct(null);
+    setEditingItem(null);
     setFormData(emptyForm);
     setShowForm(true);
   };
 
-  const openEditForm = (product: Product) => {
-    setEditingProduct(product);
+  const openEditForm = (item: MenuItem) => {
+    setEditingItem(item);
     setFormData({
-      name: product.name,
-      origin: product.origin,
-      category: product.category,
-      roast: product.roast,
-      price: product.price.toString(),
-      weight: product.weight,
-      description: product.description,
-      flavorNotes: product.flavorNotes.join(", "),
-      altitude: product.altitude,
-      process: product.process,
-      image: product.image,
-      rating: product.rating.toString(),
-      inStock: product.inStock,
+      name: item.name,
+      section: item.section,
+      category: item.category,
+      price: item.price.toString(),
+      unit: item.unit,
+      type: item.type,
+      description: item.description,
+      emoji: item.emoji,
+      inStock: item.inStock,
     });
     setShowForm(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const productData = {
+    const data = {
       name: formData.name,
-      origin: formData.origin,
+      section: formData.section,
       category: formData.category,
-      roast: formData.roast,
       price: parseFloat(formData.price) || 0,
-      weight: formData.weight,
+      unit: formData.unit,
+      type: formData.type as "sin_freir" | "preparado",
       description: formData.description,
-      flavorNotes: formData.flavorNotes
-        .split(",")
-        .map((n) => n.trim())
-        .filter(Boolean),
-      altitude: formData.altitude,
-      process: formData.process,
-      image: formData.image || "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop",
-      rating: parseFloat(formData.rating) || 4.5,
+      emoji: formData.emoji,
       inStock: formData.inStock,
     };
-
-    if (editingProduct) {
-      updateProduct(editingProduct.id, productData);
+    if (editingItem) {
+      await updateItem(editingItem.id, data);
     } else {
-      addProduct(productData);
+      await addItem(data);
     }
     setShowForm(false);
-    setEditingProduct(null);
+    setEditingItem(null);
   };
 
-  const handleDelete = (id: number) => {
-    deleteProduct(id);
+  const handleDelete = async (id: number) => {
+    await deleteItem(id);
     setDeleteConfirm(null);
   };
 
@@ -141,30 +116,29 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     }
   };
 
+  const sinFreirCount = items.filter((i) => i.type === "sin_freir").length;
+  const preparadoCount = items.filter((i) => i.type === "preparado").length;
+
   return (
     <div className="min-h-screen bg-cream-50">
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-white border-b border-coffee-200/50 shadow-sm">
+      <header className="sticky top-0 z-30 bg-white border-b border-tomato-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <button
-                onClick={onBackToShop}
-                className="p-2 hover:bg-coffee-100 rounded-full transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-coffee-700" />
+              <button onClick={onBackToShop} className="p-2 hover:bg-tomato-50 rounded-full transition-colors">
+                <ArrowLeft className="w-5 h-5 text-tomato-700" />
               </button>
               <div>
-                <h1 className="text-lg font-bold text-coffee-900">Panel Admin</h1>
-                <p className="text-xs text-coffee-500">Gestión de productos</p>
+                <h1 className="text-lg font-black text-tomato-900">Panel Admin</h1>
+                <p className="text-xs text-tomato-500">Gestión del menú</p>
               </div>
             </div>
             <button
               onClick={onLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-coffee-600 hover:text-coffee-800 hover:bg-coffee-100 rounded-full transition-all"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-tomato-600 hover:text-tomato-800 hover:bg-tomato-50 rounded-full transition-all"
             >
               <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Cerrar sesión</span>
+              <span className="hidden sm:inline">Salir</span>
             </button>
           </div>
         </div>
@@ -173,26 +147,22 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-4 border border-coffee-100/60">
-            <p className="text-xs text-coffee-500 uppercase tracking-wider">Total productos</p>
-            <p className="text-2xl font-bold text-coffee-900 mt-1">{products.length}</p>
+          <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
+            <p className="text-xs text-tomato-500 uppercase tracking-wider">Total productos</p>
+            <p className="text-2xl font-black text-tomato-900 mt-1">{items.length}</p>
           </div>
-          <div className="bg-white rounded-xl p-4 border border-coffee-100/60">
-            <p className="text-xs text-coffee-500 uppercase tracking-wider">En stock</p>
-            <p className="text-2xl font-bold text-green-700 mt-1">
-              {products.filter((p) => p.inStock).length}
-            </p>
+          <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
+            <p className="text-xs text-tomato-500 uppercase tracking-wider">Sin freír</p>
+            <p className="text-2xl font-black text-warm-700 mt-1">{sinFreirCount}</p>
           </div>
-          <div className="bg-white rounded-xl p-4 border border-coffee-100/60">
-            <p className="text-xs text-coffee-500 uppercase tracking-wider">Precio medio</p>
-            <p className="text-2xl font-bold text-coffee-900 mt-1">
-              €{(products.reduce((s, p) => s + p.price, 0) / (products.length || 1)).toFixed(2)}
-            </p>
+          <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
+            <p className="text-xs text-tomato-500 uppercase tracking-wider">Preparados</p>
+            <p className="text-2xl font-black text-olive-700 mt-1">{preparadoCount}</p>
           </div>
-          <div className="bg-white rounded-xl p-4 border border-coffee-100/60">
-            <p className="text-xs text-coffee-500 uppercase tracking-wider">Categorías</p>
-            <p className="text-2xl font-bold text-coffee-900 mt-1">
-              {new Set(products.map((p) => p.category)).size}
+          <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
+            <p className="text-xs text-tomato-500 uppercase tracking-wider">Disponibles</p>
+            <p className="text-2xl font-black text-tomato-900 mt-1">
+              {items.filter((i) => i.inStock).length}
             </p>
           </div>
         </div>
@@ -200,107 +170,76 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coffee-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tomato-400" />
             <input
               type="text"
               placeholder="Buscar productos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-coffee-200/60 rounded-xl text-sm text-coffee-800 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
             />
           </div>
           <button
             onClick={openCreateForm}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-coffee-800 hover:bg-coffee-900 text-white text-sm font-medium rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-tomato-600 hover:bg-tomato-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
           >
             <Plus className="w-4 h-4" />
             Nuevo producto
           </button>
         </div>
 
-        {/* Products Table */}
-        <div className="bg-white rounded-2xl border border-coffee-100/60 overflow-hidden">
-          {/* Desktop table */}
+        {/* Table */}
+        <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-cream-50 border-b border-coffee-100">
+              <thead className="bg-cream-50 border-b border-tomato-100">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-coffee-600 uppercase tracking-wider">
-                    Producto
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-coffee-600 uppercase tracking-wider">
-                    Categoría
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-coffee-600 uppercase tracking-wider">
-                    Tueste
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-coffee-600 uppercase tracking-wider">
-                    Precio
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-coffee-600 uppercase tracking-wider">
-                    Stock
-                  </th>
-                  <th className="text-right px-6 py-3 text-xs font-semibold text-coffee-600 uppercase tracking-wider">
-                    Acciones
-                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Producto</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Sección</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Precio</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Stock</th>
+                  <th className="text-right px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-coffee-100">
-                {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-cream-50/50 transition-colors">
+              <tbody className="divide-y divide-tomato-100">
+                {filtered.map((item) => (
+                  <tr key={item.id} className="hover:bg-cream-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-12 h-12 rounded-lg object-cover"
-                        />
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
+                          <span className="text-2xl">{item.emoji}</span>
+                        </div>
                         <div>
-                          <p className="font-medium text-coffee-900 text-sm">{product.name}</p>
-                          <p className="text-xs text-coffee-500">{product.origin}</p>
+                          <p className="font-bold text-tomato-900 text-sm">{item.name}</p>
+                          <p className="text-xs text-tomato-500">{item.category}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-cream-100 text-coffee-700 text-xs rounded-full">
-                        {product.category}
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        item.type === "sin_freir"
+                          ? "bg-warm-100 text-warm-700"
+                          : "bg-olive-100 text-olive-700"
+                      }`}>
+                        {item.type === "sin_freir" ? "Sin freír" : "Preparado"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-coffee-700">{product.roast}</td>
-                    <td className="px-6 py-4 font-semibold text-coffee-900">
-                      €{product.price.toFixed(2)}
-                    </td>
+                    <td className="px-6 py-4 font-black text-tomato-900">${item.price} CUP</td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${
-                          product.inStock
-                            ? "bg-green-50 text-green-700"
-                            : "bg-red-50 text-red-700"
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            product.inStock ? "bg-green-500" : "bg-red-500"
-                          }`}
-                        />
-                        {product.inStock ? "Disponible" : "Agotado"}
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${
+                        item.inStock ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${item.inStock ? "bg-green-500" : "bg-red-500"}`} />
+                        {item.inStock ? "Disponible" : "Agotado"}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => openEditForm(product)}
-                          className="p-2 hover:bg-coffee-100 rounded-lg transition-colors group"
-                          title="Editar"
-                        >
-                          <Edit2 className="w-4 h-4 text-coffee-500 group-hover:text-coffee-800" />
+                        <button onClick={() => openEditForm(item)} className="p-2 hover:bg-tomato-50 rounded-lg transition-colors group" title="Editar">
+                          <Edit2 className="w-4 h-4 text-tomato-500 group-hover:text-tomato-800" />
                         </button>
-                        <button
-                          onClick={() => setDeleteConfirm(product.id)}
-                          className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
-                          title="Eliminar"
-                        >
-                          <Trash2 className="w-4 h-4 text-coffee-500 group-hover:text-red-600" />
+                        <button onClick={() => setDeleteConfirm(item.id)} className="p-2 hover:bg-red-50 rounded-lg transition-colors group" title="Eliminar">
+                          <Trash2 className="w-4 h-4 text-tomato-500 group-hover:text-red-600" />
                         </button>
                       </div>
                     </td>
@@ -310,41 +249,31 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </table>
           </div>
 
-          {/* Mobile cards */}
-          <div className="md:hidden divide-y divide-coffee-100">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="p-4">
+          {/* Mobile */}
+          <div className="md:hidden divide-y divide-tomato-100">
+            {filtered.map((item) => (
+              <div key={item.id} className="p-4">
                 <div className="flex items-start gap-3">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 rounded-lg object-cover shrink-0"
-                  />
+                  <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
+                    <span className="text-2xl">{item.emoji}</span>
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-coffee-900 text-sm truncate">
-                      {product.name}
-                    </h4>
-                    <p className="text-xs text-coffee-500 mt-0.5">{product.origin}</p>
+                    <h4 className="font-bold text-tomato-900 text-sm truncate">{item.name}</h4>
+                    <p className="text-xs text-tomato-500 mt-0.5">{item.category}</p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="px-2 py-0.5 bg-cream-100 text-coffee-700 text-[10px] rounded-full">
-                        {product.category}
+                      <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${
+                        item.type === "sin_freir" ? "bg-warm-100 text-warm-700" : "bg-olive-100 text-olive-700"
+                      }`}>
+                        {item.type === "sin_freir" ? "Sin freír" : "Preparado"}
                       </span>
-                      <span className="text-xs font-semibold text-coffee-900">
-                        €{product.price.toFixed(2)}
-                      </span>
+                      <span className="text-xs font-black text-tomato-900">${item.price} CUP</span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <button
-                      onClick={() => openEditForm(product)}
-                      className="p-1.5 hover:bg-coffee-100 rounded-lg transition-colors"
-                    >
-                      <Edit2 className="w-4 h-4 text-coffee-600" />
+                    <button onClick={() => openEditForm(item)} className="p-1.5 hover:bg-tomato-50 rounded-lg">
+                      <Edit2 className="w-4 h-4 text-tomato-600" />
                     </button>
-                    <button
-                      onClick={() => setDeleteConfirm(product.id)}
-                      className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                    >
+                    <button onClick={() => setDeleteConfirm(item.id)} className="p-1.5 hover:bg-red-50 rounded-lg">
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
                   </div>
@@ -353,251 +282,100 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             ))}
           </div>
 
-          {filteredProducts.length === 0 && (
+          {filtered.length === 0 && (
             <div className="p-12 text-center">
-              <Package className="w-10 h-10 text-coffee-300 mx-auto mb-3" />
-              <p className="text-coffee-600 font-medium">No hay productos</p>
-              <p className="text-sm text-coffee-400 mt-1">
-                Crea tu primer producto para empezar
-              </p>
+              <Package className="w-10 h-10 text-tomato-300 mx-auto mb-3" />
+              <p className="text-tomato-700 font-bold">No hay productos</p>
             </div>
           )}
         </div>
       </main>
 
-      {/* Product Form Modal */}
+      {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-coffee-950/60 backdrop-blur-sm"
-            onClick={() => setShowForm(false)}
-          />
+          <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setShowForm(false)} />
           <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
-            <div className="sticky top-0 bg-white border-b border-coffee-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
-              <h2 className="text-lg font-bold text-coffee-900">
-                {editingProduct ? "Editar producto" : "Nuevo producto"}
+            <div className="sticky top-0 bg-white border-b border-tomato-100 px-6 py-4 flex items-center justify-between rounded-t-3xl z-10">
+              <h2 className="text-lg font-black text-tomato-900">
+                {editingItem ? "Editar producto" : "Nuevo producto"}
               </h2>
-              <button
-                onClick={() => setShowForm(false)}
-                className="p-2 hover:bg-coffee-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-coffee-600" />
+              <button onClick={() => setShowForm(false)} className="p-2 hover:bg-tomato-50 rounded-full">
+                <X className="w-5 h-5 text-tomato-600" />
               </button>
             </div>
-
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Nombre *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  />
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Nombre *</label>
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} required
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Origen *
-                  </label>
-                  <input
-                    type="text"
-                    name="origin"
-                    value={formData.origin}
-                    onChange={handleChange}
-                    required
-                    placeholder="Ej: Etiopía"
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Categoría *
-                  </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  >
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Sección *</label>
+                  <select name="section" value={formData.section} onChange={handleChange}
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all">
+                    {SECTIONS.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Tueste *
-                  </label>
-                  <select
-                    name="roast"
-                    value={formData.roast}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  >
-                    {ROASTS.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Categoría *</label>
+                  <input type="text" name="category" value={formData.category} onChange={handleChange} required
+                    placeholder="Ej: Croquetas (10 unid)"
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Precio (CUP) *</label>
+                  <input type="number" min="0" name="price" value={formData.price} onChange={handleChange} required
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Unidad *</label>
+                  <input type="text" name="unit" value={formData.unit} onChange={handleChange} required
+                    placeholder="Ej: 10 unidades"
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Descripción *</label>
+                  <textarea name="description" value={formData.description} onChange={handleChange} required rows={2}
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all resize-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
+                  <div className="flex flex-wrap gap-2">
+                    {EMOJIS.map((e) => (
+                      <button
+                        key={e}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, emoji: e })}
+                        className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all ${
+                          formData.emoji === e
+                            ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
+                            : "bg-cream-50 hover:bg-cream-100"
+                        }`}
+                      >
+                        {e}
+                      </button>
                     ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Precio (€) *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Peso *
-                  </label>
-                  <input
-                    type="text"
-                    name="weight"
-                    value={formData.weight}
-                    onChange={handleChange}
-                    required
-                    placeholder="250g"
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Altitud
-                  </label>
-                  <input
-                    type="text"
-                    name="altitude"
-                    value={formData.altitude}
-                    onChange={handleChange}
-                    placeholder="1,800 - 2,000 m"
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Proceso
-                  </label>
-                  <input
-                    type="text"
-                    name="process"
-                    value={formData.process}
-                    onChange={handleChange}
-                    placeholder="Lavado, Natural..."
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Descripción *
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    required
-                    rows={3}
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all resize-none"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Notas de cata (separadas por coma)
-                  </label>
-                  <input
-                    type="text"
-                    name="flavorNotes"
-                    value={formData.flavorNotes}
-                    onChange={handleChange}
-                    placeholder="Jazmín, Bergamota, Miel"
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    URL de imagen
-                  </label>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coffee-400" />
-                      <input
-                        type="url"
-                        name="image"
-                        value={formData.image}
-                        onChange={handleChange}
-                        placeholder="https://..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                      />
-                    </div>
                   </div>
-                  {formData.image && (
-                    <img
-                      src={formData.image}
-                      alt="Preview"
-                      className="mt-2 w-20 h-20 rounded-lg object-cover border border-coffee-200"
-                      onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
-                    />
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-coffee-700 mb-1.5">
-                    Valoración (0-5)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="5"
-                    name="rating"
-                    value={formData.rating}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-coffee-200/60 rounded-xl text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                  />
                 </div>
                 <div className="flex items-center gap-3 pt-6">
-                  <input
-                    type="checkbox"
-                    name="inStock"
-                    checked={formData.inStock}
-                    onChange={handleChange}
-                    className="w-4 h-4 rounded border-coffee-300 text-coffee-700 focus:ring-warm-400"
-                  />
-                  <label className="text-sm font-medium text-coffee-700">
-                    Disponible en stock
-                  </label>
+                  <input type="checkbox" name="inStock" checked={formData.inStock} onChange={handleChange}
+                    className="w-4 h-4 rounded border-tomato-300 text-tomato-700 focus:ring-warm-400" />
+                  <label className="text-sm font-bold text-tomato-800">Disponible</label>
                 </div>
               </div>
-
-              <div className="flex gap-3 pt-4 border-t border-coffee-100">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="flex-1 py-3 border border-coffee-200 text-coffee-700 font-medium rounded-xl hover:bg-coffee-50 transition-all"
-                >
+              <div className="flex gap-3 pt-4 border-t border-tomato-100">
+                <button type="button" onClick={() => setShowForm(false)}
+                  className="flex-1 py-3 border border-tomato-200 text-tomato-700 font-bold rounded-xl hover:bg-tomato-50 transition-all">
                   Cancelar
                 </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-coffee-800 hover:bg-coffee-900 text-white font-semibold rounded-xl transition-all hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2"
-                >
+                <button type="submit"
+                  className="flex-1 py-3 bg-tomato-600 hover:bg-tomato-700 text-white font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
                   <Save className="w-4 h-4" />
-                  {editingProduct ? "Guardar cambios" : "Crear producto"}
+                  {editingItem ? "Guardar" : "Crear"}
                 </button>
               </div>
             </form>
@@ -605,34 +383,23 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         </div>
       )}
 
-      {/* Delete confirmation */}
+      {/* Delete confirm */}
       {deleteConfirm !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-coffee-950/60 backdrop-blur-sm"
-            onClick={() => setDeleteConfirm(null)}
-          />
+          <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setDeleteConfirm(null)} />
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
             <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 className="w-6 h-6 text-red-600" />
             </div>
-            <h3 className="text-lg font-bold text-coffee-900 text-center mb-2">
-              ¿Eliminar producto?
-            </h3>
-            <p className="text-sm text-coffee-500 text-center mb-6">
-              Esta acción no se puede deshacer.
-            </p>
+            <h3 className="text-lg font-black text-tomato-900 text-center mb-2">¿Eliminar producto?</h3>
+            <p className="text-sm text-tomato-500 text-center mb-6">Esta acción no se puede deshacer.</p>
             <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteConfirm(null)}
-                className="flex-1 py-2.5 border border-coffee-200 text-coffee-700 font-medium rounded-xl hover:bg-coffee-50 transition-all"
-              >
+              <button onClick={() => setDeleteConfirm(null)}
+                className="flex-1 py-2.5 border border-tomato-200 text-tomato-700 font-bold rounded-xl hover:bg-tomato-50 transition-all">
                 Cancelar
               </button>
-              <button
-                onClick={() => handleDelete(deleteConfirm)}
-                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all"
-              >
+              <button onClick={() => handleDelete(deleteConfirm)}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all">
                 Eliminar
               </button>
             </div>
