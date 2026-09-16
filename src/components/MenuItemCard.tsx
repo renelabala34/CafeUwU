@@ -26,13 +26,13 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
       <button
         onClick={() => onViewDetail(item)}
         disabled={isOutOfStock}
-        className={`relative aspect-square w-full flex items-center justify-center cursor-pointer ${
+        className={`relative h-24 sm:h-28 md:h-32 w-full flex items-center justify-center cursor-pointer ${
           isOutOfStock 
             ? "bg-gradient-to-br from-gray-100 to-gray-200 cursor-not-allowed" 
             : "bg-gradient-to-br from-cream-100 to-warm-100 active:scale-95 transition-transform duration-150"
         }`}
       >
-        <span className={`text-5xl sm:text-6xl md:text-7xl transition-transform duration-500 ${
+        <span className={`text-3xl sm:text-4xl md:text-5xl transition-transform duration-500 ${
           isOutOfStock ? "grayscale" : "group-hover:scale-110"
         }`}>
           {item.emoji}
@@ -42,14 +42,14 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
         )}
         
         {/* Type badge */}
-        <span className={`absolute top-2 left-2 sm:top-3 sm:left-3 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-xs font-semibold rounded-full border ${typeColor}`}>
+        <span className={`absolute top-1.5 left-1.5 sm:top-3 sm:left-3 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[8px] sm:text-xs font-semibold rounded-full border ${typeColor}`}>
           {typeLabel}
         </span>
 
         {/* Out of stock badge */}
         {isOutOfStock && (
           <div className="absolute inset-0 bg-gray-900/40 flex items-center justify-center">
-            <span className="bg-red-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg">
+            <span className="bg-red-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-sm font-bold shadow-lg">
               AGOTADO
             </span>
           </div>
@@ -57,54 +57,54 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
 
         {/* Quick view icon - solo visible en desktop al hacer hover */}
         {!isOutOfStock && (
-          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 p-2 sm:p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tomato-700" />
+          <div className="absolute bottom-1.5 right-1.5 sm:bottom-3 sm:right-3 p-1.5 sm:p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+            <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-tomato-700" />
           </div>
         )}
       </button>
 
       {/* Content */}
-      <div className="p-3 sm:p-4 md:p-5 flex flex-col flex-1">
-        <h3 className={`font-bold text-xs sm:text-sm md:text-base leading-tight mb-0.5 sm:mb-1 line-clamp-2 ${
+      <div className="p-2 sm:p-3 md:p-4 flex flex-col flex-1">
+        <h3 className={`font-bold text-[11px] sm:text-sm md:text-base leading-tight mb-0.5 sm:mb-1 line-clamp-2 ${
           isOutOfStock ? "text-gray-500" : "text-tomato-900"
         }`}>
           {item.name}
         </h3>
-        <p className={`text-[10px] sm:text-xs mb-2 sm:mb-3 truncate ${
+        <p className={`text-[9px] sm:text-[10px] md:text-xs mb-1.5 sm:mb-2 truncate ${
           isOutOfStock ? "text-gray-400" : "text-tomato-500"
         }`}>
-          {item.category}
+          {item.quantity} unidades
         </p>
-        <p className={`text-[10px] sm:text-xs line-clamp-2 mb-3 sm:mb-4 flex-1 hidden sm:block ${
+        <p className={`text-[9px] sm:text-xs line-clamp-2 mb-2 sm:mb-3 flex-1 hidden sm:block ${
           isOutOfStock ? "text-gray-400" : "text-tomato-600/70"
         }`}>
           {item.description}
         </p>
 
         {/* Price and Add */}
-        <div className="flex items-center justify-between mt-auto pt-2 sm:pt-3 border-t border-tomato-100/60">
+        <div className="flex items-center justify-between mt-auto pt-1.5 sm:pt-2 border-t border-tomato-100/60">
           <div>
-            <span className={`text-base sm:text-lg md:text-xl font-black ${
+            <span className={`text-sm sm:text-lg md:text-xl font-black ${
               isOutOfStock ? "text-gray-400" : "text-tomato-700"
             }`}>
               ${item.price}
             </span>
-            <span className={`text-[10px] sm:text-xs ml-0.5 sm:ml-1 ${
+            <span className={`text-[9px] sm:text-xs ml-0.5 sm:ml-1 ${
               isOutOfStock ? "text-gray-300" : "text-tomato-400"
             }`}>
               CUP
             </span>
           </div>
           {isOutOfStock ? (
-            <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-8 h-8 sm:w-auto sm:px-3 sm:py-2 bg-gray-300 text-gray-500 text-xs sm:text-sm font-semibold rounded-full cursor-not-allowed">
+            <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-7 h-7 sm:w-auto sm:px-3 sm:py-2 bg-gray-300 text-gray-500 text-[10px] sm:text-sm font-semibold rounded-full cursor-not-allowed">
               <span className="hidden sm:inline">Agotado</span>
             </div>
           ) : (
             <button
               onClick={() => addToCart(item)}
-              className="flex items-center justify-center gap-1 sm:gap-1.5 w-8 h-8 sm:w-auto sm:px-3 sm:py-2 bg-tomato-600 hover:bg-tomato-700 text-white text-xs sm:text-sm font-semibold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-tomato-600/20 active:scale-95"
+              className="flex items-center justify-center gap-1 sm:gap-1.5 w-7 h-7 sm:w-auto sm:px-3 sm:py-2 bg-tomato-600 hover:bg-tomato-700 text-white text-[10px] sm:text-sm font-semibold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-tomato-600/20 active:scale-95"
             >
-              <ShoppingCart className="w-3.5 h-3.5" />
+              <ShoppingCart className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span className="hidden sm:inline">Añadir</span>
             </button>
           )}

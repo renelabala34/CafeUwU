@@ -55,7 +55,7 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-sm text-tomato-900 truncate">{ci.item.name}</h4>
-                  <p className="text-xs text-tomato-500 mt-0.5">{ci.item.unit}</p>
+                  <p className="text-xs text-tomato-500 mt-0.5">{ci.item.quantity} unidades</p>
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center gap-1.5 bg-white rounded-full border border-tomato-200/60 p-0.5">
                       <button

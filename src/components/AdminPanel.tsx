@@ -21,9 +21,8 @@ const EMOJIS = ["🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", 
 interface ItemForm {
   name: string;
   section: string;
-  category: string;
   price: string;
-  unit: string;
+  quantity: string;
   type: "sin_freir" | "preparado";
   description: string;
   emoji: string;
@@ -33,9 +32,8 @@ interface ItemForm {
 const emptyForm: ItemForm = {
   name: "",
   section: "sin_freir",
-  category: "",
   price: "",
-  unit: "",
+  quantity: "1",
   type: "sin_freir",
   description: "",
   emoji: "🍗",
@@ -54,8 +52,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const filtered = items.filter(
     (i) =>
       searchQuery === "" ||
-      i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      i.category.toLowerCase().includes(searchQuery.toLowerCase())
+      i.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const openCreateForm = () => {
@@ -69,9 +66,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     setFormData({
       name: item.name,
       section: item.section,
-      category: item.category,
       price: item.price.toString(),
-      unit: item.unit,
+      quantity: item.quantity.toString(),
       type: item.type,
       description: item.description,
       emoji: item.emoji,
@@ -85,9 +81,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     const data = {
       name: formData.name,
       section: formData.section,
-      category: formData.category,
       price: parseFloat(formData.price) || 0,
-      unit: formData.unit,
+      quantity: parseInt(formData.quantity) || 1,
       type: formData.type as "sin_freir" | "preparado",
       description: formData.description,
       emoji: formData.emoji,
@@ -223,7 +218,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                         </div>
                         <div>
                           <p className="font-bold text-tomato-900 text-sm">{item.name}</p>
-                          <p className="text-xs text-tomato-500">{item.category}</p>
+                          <p className="text-xs text-tomato-500">{item.quantity} unidades</p>
                         </div>
                       </div>
                     </td>
@@ -271,7 +266,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-tomato-900 text-sm truncate">{item.name}</h4>
-                    <p className="text-xs text-tomato-500 mt-0.5">{item.category}</p>
+                    <p className="text-xs text-tomato-500 mt-0.5">{item.quantity} unidades</p>
                     <div className="flex items-center gap-2 mt-2">
                       <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${
                         item.type === "sin_freir" ? "bg-warm-100 text-warm-700" : "bg-olive-100 text-olive-700"
@@ -333,20 +328,14 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Categoría *</label>
-                  <input type="text" name="category" value={formData.category} onChange={handleChange} required
-                    placeholder="Ej: Croquetas (10 unid)"
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
-                </div>
-                <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Precio (CUP) *</label>
                   <input type="number" min="0" name="price" value={formData.price} onChange={handleChange} required
                     className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Unidad *</label>
-                  <input type="text" name="unit" value={formData.unit} onChange={handleChange} required
-                    placeholder="Ej: 10 unidades"
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Cantidad por paquete *</label>
+                  <input type="number" min="1" name="quantity" value={formData.quantity} onChange={handleChange} required
+                    placeholder="Ej: 10"
                     className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
                 </div>
                 <div className="sm:col-span-2">
