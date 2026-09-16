@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { CartProvider } from "./context/CartContext";
 import { MenuProvider, useMenu } from "./context/MenuContext";
 import { sections, businessInfo, MenuItem } from "./data/menu";
@@ -19,10 +19,32 @@ function ShopContent() {
   const [selectedSection, setSelectedSection] = useState("todos");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
-  const [page, setPage] = useState<Page>("shop");
+  const [page, setPageState] = useState<Page>("shop");
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => sessionStorage.getItem("admin_auth") === "true"
   );
+
+  // Función para cambiar de página y actualizar el historial del navegador
+  const setPage = useCallback((newPage: Page) => {
+    setPageState(newPage);
+    // Agregar entrada al historial del navegador
+    if (newPage !== "shop") {
+      window.history.pushState({ page: newPage }, "", `#${newPage}`);
+    } else {
+      window.history.pushState({ page: "shop" }, "", window.location.pathname);
+    }
+  }, []);
+
+  // Escuchar el evento popstate (cuando el usuario presiona atrás/adelante)
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const newPage = event.state?.page || "shop";
+      setPageState(newPage as Page);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
