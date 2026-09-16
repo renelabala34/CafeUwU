@@ -22,6 +22,7 @@ export default function Checkout({ onBack }: CheckoutProps) {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [termsError, setTermsError] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"efectivo" | "transferencia">("efectivo");
 
   const deliveryFee = totalPrice > 0 ? businessInfo.delivery_fee : 0;
   const grandTotal = totalPrice + deliveryFee;
@@ -54,8 +55,12 @@ export default function Checkout({ onBack }: CheckoutProps) {
     lines.push(`Envío: $${deliveryFee} CUP`);
     lines.push(`💰 *TOTAL: $${grandTotal} CUP*`);
     lines.push("");
-    lines.push("💳 *Método de Pago:*");
-    lines.push("• Producto: 50% transferencia + 50% efectivo");
+    lines.push("💳 *Método de Pago del Producto:*");
+    if (paymentMethod === "efectivo") {
+      lines.push("• 100% Efectivo");
+    } else {
+      lines.push("• 50% Transferencia + 50% Efectivo");
+    }
     lines.push("• Mensajería: $200 CUP (solo efectivo)");
     lines.push("");
     lines.push("¡Gracias por tu pedido! 🍽️");
@@ -190,6 +195,65 @@ export default function Checkout({ onBack }: CheckoutProps) {
                 </div>
               </div>
 
+              {/* Método de pago */}
+              <div className="mt-6">
+                <label className="block text-sm font-bold text-tomato-800 mb-3">
+                  Método de pago del producto *
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("efectivo")}
+                    className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                      paymentMethod === "efectivo"
+                        ? "border-tomato-600 bg-tomato-50 shadow-md"
+                        : "border-tomato-100 bg-white hover:border-tomato-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        paymentMethod === "efectivo"
+                          ? "border-tomato-600 bg-tomato-600"
+                          : "border-tomato-300"
+                      }`}>
+                        {paymentMethod === "efectivo" && (
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <span className="font-bold text-sm text-tomato-900">100% Efectivo</span>
+                    </div>
+                    <p className="text-xs text-tomato-600 leading-relaxed">
+                      Pago completo en efectivo al recibir
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("transferencia")}
+                    className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                      paymentMethod === "transferencia"
+                        ? "border-tomato-600 bg-tomato-50 shadow-md"
+                        : "border-tomato-100 bg-white hover:border-tomato-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        paymentMethod === "transferencia"
+                          ? "border-tomato-600 bg-tomato-600"
+                          : "border-tomato-300"
+                      }`}>
+                        {paymentMethod === "transferencia" && (
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <span className="font-bold text-sm text-tomato-900">50-50</span>
+                    </div>
+                    <p className="text-xs text-tomato-600 leading-relaxed">
+                      50% transferencia + 50% efectivo
+                    </p>
+                  </button>
+                </div>
+              </div>
+
               {/* Checkbox de aceptación de reglas */}
               <div className="mt-6 p-4 bg-cream-50 rounded-xl border border-tomato-100/60">
                 <label className="flex items-start gap-3 cursor-pointer group">
@@ -272,7 +336,11 @@ export default function Checkout({ onBack }: CheckoutProps) {
                   <Info className="w-4 h-4 text-warm-700 shrink-0 mt-0.5" />
                   <div className="text-xs text-warm-800 leading-relaxed">
                     <p className="font-bold mb-1">Método de pago:</p>
-                    <p className="mb-1">• Producto: 50% transferencia + 50% efectivo</p>
+                    <p className="mb-1">
+                      • Producto: {paymentMethod === "efectivo" 
+                        ? "100% Efectivo" 
+                        : "50% transferencia + 50% efectivo"}
+                    </p>
                     <p>• Mensajería: $200 CUP (solo efectivo)</p>
                   </div>
                 </div>
