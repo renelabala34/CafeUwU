@@ -53,6 +53,13 @@
     background-color: var(--color-cream-50);
     color: var(--color-tomato-950);
   }
+
+  /* Aumentar tamaño de fuente base en móviles */
+  @media (max-width: 640px) {
+    html {
+      font-size: 17px;
+    }
+  }
 }
 
 @layer utilities {
