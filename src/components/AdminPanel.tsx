@@ -2,10 +2,9 @@ import { useState, useRef } from "react";
 import { useMenu } from "../context/MenuContext";
 import { MenuItem } from "../data/menu";
 import {
-  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save, Key, Upload, Image as ImageIcon,
+  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save, Key,
 } from "lucide-react";
 import ChangePassword from "./ChangePassword";
-import { supabase } from "../lib/supabase";
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -28,7 +27,6 @@ interface ItemForm {
   description: string;
   emoji: string;
   inStock: boolean;
-  imageUrl?: string;
 }
 
 const emptyForm: ItemForm = {
@@ -40,7 +38,6 @@ const emptyForm: ItemForm = {
   description: "",
   emoji: "🍗",
   inStock: true,
-  imageUrl: "",
 };
 
 export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) {
@@ -51,8 +48,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [formData, setFormData] = useState<ItemForm>(emptyForm);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filtered = items.filter(
     (i) =>
@@ -77,7 +72,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       description: item.description,
       emoji: item.emoji,
       inStock: item.inStock,
-      imageUrl: item.imageUrl || "",
     });
     setShowForm(true);
   };
@@ -93,7 +87,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       description: formData.description,
       emoji: formData.emoji,
       inStock: formData.inStock,
-      imageUrl: formData.imageUrl,
     };
     if (editingItem) {
       await updateItem(editingItem.id, data);
@@ -102,46 +95,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     }
     setShowForm(false);
     setEditingItem(null);
-  };
-
-  // Función para subir imagen a Supabase Storage
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !supabase) return;
-
-    setUploadingImage(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      
-      const { data, error } = await supabase.storage
-        .from('productos')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (error) throw error;
-
-      // Obtener URL pública
-      const { data: { publicUrl } } = supabase.storage
-        .from('productos')
-        .getPublicUrl(fileName);
-
-      setFormData({ ...formData, imageUrl: publicUrl });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Error al subir la imagen. Intenta de nuevo.');
-    } finally {
-      setUploadingImage(false);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setFormData({ ...formData, imageUrl: "" });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   };
 
   const handleDelete = async (id: number) => {
@@ -260,12 +213,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                   <tr key={item.id} className="hover:bg-cream-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0 overflow-hidden">
-                          {item.imageUrl ? (
-                            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-2xl">{item.emoji}</span>
-                          )}
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
+                          <span className="text-2xl">{item.emoji}</span>
                         </div>
                         <div>
                           <p className="font-bold text-tomato-900 text-sm">{item.name}</p>
@@ -312,12 +261,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             {filtered.map((item) => (
               <div key={item.id} className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0 overflow-hidden">
-                    {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-2xl">{item.emoji}</span>
-                    )}
+                  <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
+                    <span className="text-2xl">{item.emoji}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-tomato-900 text-sm truncate">{item.name}</h4>
@@ -397,51 +342,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Descripción *</label>
                   <textarea name="description" value={formData.description} onChange={handleChange} required rows={2}
                     className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all resize-none" />
-                </div>
-                
-                {/* Campo para subir imagen */}
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Imagen del producto</label>
-                  {formData.imageUrl ? (
-                    <div className="relative w-full h-48 rounded-xl overflow-hidden border border-tomato-100 bg-gray-50">
-                      <img src={formData.imageUrl} alt="Vista previa" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={handleRemoveImage}
-                        className="absolute top-2 right-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg transition-all"
-                        title="Eliminar imagen"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="border-2 border-dashed border-tomato-200 rounded-xl p-6 text-center hover:border-tomato-400 transition-colors bg-cream-50">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        disabled={uploadingImage}
-                        className="hidden"
-                        id="image-upload"
-                      />
-                      <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center gap-3">
-                        <div className={`p-4 rounded-full ${uploadingImage ? 'bg-tomato-100' : 'bg-white'} shadow-sm`}>
-                          {uploadingImage ? (
-                            <div className="w-8 h-8 border-4 border-tomato-300 border-t-tomato-600 rounded-full animate-spin" />
-                          ) : (
-                            <Upload className="w-8 h-8 text-tomato-600" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-tomato-800">
-                            {uploadingImage ? "Subiendo..." : "Subir imagen"}
-                          </p>
-                          <p className="text-xs text-tomato-500 mt-1">JPG, PNG - Máx 5MB</p>
-                        </div>
-                      </label>
-                    </div>
-                  )}
                 </div>
 
                 <div>

@@ -1,7 +1,6 @@
 import { ShoppingCart, Eye } from "lucide-react";
 import { MenuItem } from "../data/menu";
 import { useCart } from "../context/CartContext";
-import { useState } from "react";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -10,11 +9,7 @@ interface MenuItemCardProps {
 
 export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) {
   const { addToCart } = useCart();
-  const [imageError, setImageError] = useState(false);
   const isOutOfStock = !item.inStock;
-  
-  // URL de la imagen (prioriza imageUrl sobre emoji)
-  const imageUrl = item.imageUrl && !imageError ? item.imageUrl : null;
 
   const typeLabel = item.type === "sin_freir" ? "Sin freír" : "Preparado";
   const typeColor = item.type === "sin_freir"
@@ -27,33 +22,22 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
         ? "border-gray-200 opacity-75 hover:opacity-90" 
         : "border-tomato-100/60 hover:-translate-y-1"
     }`}>
-      {/* Imagen / Emoji / Visual - Clickable */}
+      {/* Emoji / Visual - Clickable */}
       <button
         onClick={() => onViewDetail(item)}
         disabled={isOutOfStock}
-        className={`relative h-40 sm:h-48 md:h-56 w-full flex items-center justify-center cursor-pointer overflow-hidden ${
+        className={`relative h-40 sm:h-48 md:h-56 w-full flex items-center justify-center cursor-pointer ${
           isOutOfStock 
             ? "bg-gradient-to-br from-gray-100 to-gray-200 cursor-not-allowed" 
             : "bg-gradient-to-br from-cream-100 to-warm-100 active:scale-95 transition-transform duration-150"
         }`}
       >
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={item.name}
-            onError={() => setImageError(true)}
-            className={`w-full h-full object-cover transition-transform duration-500 ${
-              isOutOfStock ? "grayscale" : "group-hover:scale-110"
-            }`}
-          />
-        ) : (
-          <span className={`text-3xl sm:text-4xl md:text-5xl transition-transform duration-500 ${
-            isOutOfStock ? "grayscale" : "group-hover:scale-110"
-          }`}>
-            {item.emoji}
-          </span>
-        )}
-        {!isOutOfStock && !imageUrl && (
+        <span className={`text-3xl sm:text-4xl md:text-5xl transition-transform duration-500 ${
+          isOutOfStock ? "grayscale" : "group-hover:scale-110"
+        }`}>
+          {item.emoji}
+        </span>
+        {!isOutOfStock && (
           <div className="absolute inset-0 bg-gradient-to-t from-tomato-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         )}
         
