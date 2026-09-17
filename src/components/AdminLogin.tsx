@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Lock, ArrowLeft, Shield } from "lucide-react";
+import { Lock, ArrowLeft, Shield, Eye, EyeOff } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { verifyPassword } from "../lib/security";
 
@@ -11,6 +11,7 @@ interface AdminLoginProps {
 export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -107,14 +108,24 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
             </div>
             <div>
               <label className="block text-sm font-bold text-tomato-800 mb-1.5">Contraseña</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="••••••••"
-                className="w-full px-4 py-3 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-tomato-400 hover:text-tomato-600 transition-colors"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             {error && (
