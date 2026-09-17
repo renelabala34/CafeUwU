@@ -237,7 +237,7 @@ function ShopContent() {
                 <li className="flex items-center gap-2">
                   <Instagram className="w-3.5 h-3.5 shrink-0" />
                   <a
-                    href="https://instagram.com/imas"
+                    href="https://instagram.com/imasparati"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-cream-300/70 hover:text-white transition-colors"

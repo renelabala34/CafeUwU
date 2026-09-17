@@ -42,14 +42,14 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
         )}
         
         {/* Type badge */}
-        <span className={`absolute top-1.5 left-1.5 sm:top-3 sm:left-3 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[8px] sm:text-xs font-semibold rounded-full border ${typeColor}`}>
+        <span className={`absolute top-1.5 left-1.5 sm:top-3 sm:left-3 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full border ${typeColor}`}>
           {typeLabel}
         </span>
 
         {/* Out of stock badge */}
         {isOutOfStock && (
           <div className="absolute inset-0 bg-gray-900/40 flex items-center justify-center">
-            <span className="bg-red-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-sm font-bold shadow-lg">
+            <span className="bg-red-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-full text-[11px] sm:text-sm font-bold shadow-lg">
               AGOTADO
             </span>
           </div>
@@ -65,17 +65,17 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
 
       {/* Content */}
       <div className="p-2 sm:p-3 md:p-4 flex flex-col flex-1">
-        <h3 className={`font-bold text-[11px] sm:text-sm md:text-base leading-tight mb-0.5 sm:mb-1 line-clamp-2 ${
+        <h3 className={`font-bold text-[13px] sm:text-sm md:text-base leading-tight mb-0.5 sm:mb-1 line-clamp-2 ${
           isOutOfStock ? "text-gray-500" : "text-tomato-900"
         }`}>
           {item.name}
         </h3>
-        <p className={`text-[9px] sm:text-[10px] md:text-xs mb-1.5 sm:mb-2 truncate ${
+        <p className={`text-[11px] sm:text-[12px] md:text-xs mb-1.5 sm:mb-2 truncate ${
           isOutOfStock ? "text-gray-400" : "text-tomato-500"
         }`}>
           {item.quantity} unidades
         </p>
-        <p className={`text-[9px] sm:text-xs line-clamp-2 mb-2 sm:mb-3 flex-1 hidden sm:block ${
+        <p className={`text-[11px] sm:text-xs line-clamp-2 mb-2 sm:mb-3 flex-1 hidden sm:block ${
           isOutOfStock ? "text-gray-400" : "text-tomato-600/70"
         }`}>
           {item.description}
@@ -84,25 +84,25 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
         {/* Price and Add */}
         <div className="flex items-center justify-between mt-auto pt-1.5 sm:pt-2 border-t border-tomato-100/60">
           <div>
-            <span className={`text-sm sm:text-lg md:text-xl font-black ${
+            <span className={`text-base sm:text-lg md:text-xl font-black ${
               isOutOfStock ? "text-gray-400" : "text-tomato-700"
             }`}>
               ${item.price}
             </span>
-            <span className={`text-[9px] sm:text-xs ml-0.5 sm:ml-1 ${
+            <span className={`text-[10px] sm:text-xs ml-0.5 sm:ml-1 ${
               isOutOfStock ? "text-gray-300" : "text-tomato-400"
             }`}>
               CUP
             </span>
           </div>
           {isOutOfStock ? (
-            <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-7 h-7 sm:w-auto sm:px-3 sm:py-2 bg-gray-300 text-gray-500 text-[10px] sm:text-sm font-semibold rounded-full cursor-not-allowed">
+            <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-7 h-7 sm:w-auto sm:px-3 sm:py-2 bg-gray-300 text-gray-500 text-[11px] sm:text-sm font-semibold rounded-full cursor-not-allowed">
               <span className="hidden sm:inline">Agotado</span>
             </div>
           ) : (
             <button
               onClick={() => addToCart(item)}
-              className="flex items-center justify-center gap-1 sm:gap-1.5 w-7 h-7 sm:w-auto sm:px-3 sm:py-2 bg-tomato-600 hover:bg-tomato-700 text-white text-[10px] sm:text-sm font-semibold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-tomato-600/20 active:scale-95"
+              className="flex items-center justify-center gap-1 sm:gap-1.5 w-7 h-7 sm:w-auto sm:px-3 sm:py-2 bg-tomato-600 hover:bg-tomato-700 text-white text-[11px] sm:text-sm font-semibold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-tomato-600/20 active:scale-95"
             >
               <ShoppingCart className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span className="hidden sm:inline">Añadir</span>
