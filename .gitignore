@@ -1,44 +1,76 @@
 ```
-# Database migration files
-*.sql
-
 # Dependencies
 node_modules/
-
-# Environment variables
-.env
-.env.local
-.env.*
 
 # Build outputs
 dist/
 build/
 target/
 
-# Python specific
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.egg-info/
-.eggs/
+*.py.class
+.Python
+env/
+venv/
+.venv/
+.venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+.MF
+tags
+TAGS
+.idlerc/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
 
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
 
-# IDE files
+# Environment variables
+.env
+.env.local
+.env.dev
+.env.production
+.env.test
+*.env
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
-
-# OS generated files
+*~
 .DS_Store
 Thumbs.db
 
@@ -50,11 +82,37 @@ coverage/
 
 # Distribution / packaging
 *.tar.gz
-*.whl
-*.egg
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 
-# Local configuration
-.env.local
-.env.production.local
-.env.development.local
+# Coverage
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Compiled files
+*.class
+*.o
+*.obj
+*.out
+*.dll
+*.so
+*.a
+*.exe
+*.bin
+
+# Database
+*.db
+*.db-journal
+
+# Documentation
+docs/_build/
 ```

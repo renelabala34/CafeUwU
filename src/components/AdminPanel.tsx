@@ -16,7 +16,11 @@ const SECTIONS = [
   { value: "preparado", label: "Especial I'MAS — Preparados" },
 ];
 
-const EMOJIS = ["🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", "🍖", "🥩", "🍕", "🌮"];
+const EMOJIS = [
+  "🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", "🍖", "🥩", "🍕", "🌮",
+  "🍤", "🥘", "🍲", "🥙", "🍛", "🍝", "🥐", "🥖", "🫓", "🧈", "🥚",
+  "🥗", "🫘", "🍚", "🥄", "🍴", "🥢", "🧂", "🌶️", "🧄", "🧅"
+];
 
 interface ItemForm {
   name: string;

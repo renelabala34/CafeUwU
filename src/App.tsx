@@ -100,10 +100,17 @@ function ShopContent() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-tomato-700 via-tomato-600 to-warm-600">
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-20">
           <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-cream-300 blur-3xl" />
           <div className="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-warm-300 blur-3xl" />
         </div>
+        {/* Imagen de fondo de comida cubana */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-15 mix-blend-overlay"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=1920&q=80')"
+          }}
+        />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <div className="max-w-2xl">
             <div className="flex flex-wrap items-center gap-2 mb-3">
