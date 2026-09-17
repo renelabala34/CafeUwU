@@ -8,7 +8,6 @@ export interface MenuItem {
   description: string;
   emoji: string;
   inStock: boolean;
-  imageUrl?: string;
 }
 
 export const sections = [
