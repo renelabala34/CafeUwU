@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
   description TEXT,
   emoji VARCHAR(10) DEFAULT '🍽️',
   in_stock BOOLEAN DEFAULT true,
+  image_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -73,6 +74,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
 CREATE INDEX IF NOT EXISTS idx_menu_items_type ON menu_items(type);
 CREATE INDEX IF NOT EXISTS idx_menu_items_section ON menu_items(section);
 CREATE INDEX IF NOT EXISTS idx_menu_items_in_stock ON menu_items(in_stock);
+CREATE INDEX IF NOT EXISTS idx_menu_items_image_url ON menu_items(image_url);
 
 -- Insertar datos iniciales
 INSERT INTO menu_items (name, section, price, quantity, type, description, emoji, in_stock) VALUES
