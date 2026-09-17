@@ -103,6 +103,20 @@ export function MenuProvider({ children }: { children: ReactNode }) {
   const addItem = async (item: Omit<MenuItem, "id">) => {
     if (supabase) {
       try {
+        // Primero verificar si ya existe un producto con el mismo nombre, sección y tipo
+        const { data: existing } = await supabase
+          .from('menu_items')
+          .select('id')
+          .eq('name', item.name)
+          .eq('section', item.section)
+          .eq('type', item.type)
+          .maybeSingle();
+
+        if (existing) {
+          alert('Ya existe un producto con el mismo nombre, sección y tipo.');
+          return;
+        }
+
         const { data, error } = await supabase
           .from('menu_items')
           .insert([menuItemToDb(item)])

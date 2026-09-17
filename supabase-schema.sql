@@ -66,7 +66,8 @@ CREATE TABLE IF NOT EXISTS menu_items (
   emoji VARCHAR(10) DEFAULT '🍽️',
   in_stock BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (name, section, type)
 );
 
 -- Crear índice para búsquedas rápidas
