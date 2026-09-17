@@ -1,6 +1,7 @@
 import { ShoppingCart, Eye } from "lucide-react";
 import { MenuItem } from "../data/menu";
 import { useCart } from "../context/CartContext";
+import { useState } from "react";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -9,7 +10,11 @@ interface MenuItemCardProps {
 
 export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) {
   const { addToCart } = useCart();
+  const [imageError, setImageError] = useState(false);
   const isOutOfStock = !item.inStock;
+  
+  // URL de la imagen (prioriza imageUrl sobre emoji)
+  const imageUrl = item.imageUrl && !imageError ? item.imageUrl : null;
 
   const typeLabel = item.type === "sin_freir" ? "Sin freír" : "Preparado";
   const typeColor = item.type === "sin_freir"
@@ -22,34 +27,45 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
         ? "border-gray-200 opacity-75 hover:opacity-90" 
         : "border-tomato-100/60 hover:-translate-y-1"
     }`}>
-      {/* Emoji / Visual - Clickable */}
+      {/* Imagen / Emoji / Visual - Clickable */}
       <button
         onClick={() => onViewDetail(item)}
         disabled={isOutOfStock}
-        className={`relative h-24 sm:h-28 md:h-32 w-full flex items-center justify-center cursor-pointer ${
+        className={`relative h-40 sm:h-48 md:h-56 w-full flex items-center justify-center cursor-pointer overflow-hidden ${
           isOutOfStock 
             ? "bg-gradient-to-br from-gray-100 to-gray-200 cursor-not-allowed" 
             : "bg-gradient-to-br from-cream-100 to-warm-100 active:scale-95 transition-transform duration-150"
         }`}
       >
-        <span className={`text-3xl sm:text-4xl md:text-5xl transition-transform duration-500 ${
-          isOutOfStock ? "grayscale" : "group-hover:scale-110"
-        }`}>
-          {item.emoji}
-        </span>
-        {!isOutOfStock && (
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={item.name}
+            onError={() => setImageError(true)}
+            className={`w-full h-full object-cover transition-transform duration-500 ${
+              isOutOfStock ? "grayscale" : "group-hover:scale-110"
+            }`}
+          />
+        ) : (
+          <span className={`text-3xl sm:text-4xl md:text-5xl transition-transform duration-500 ${
+            isOutOfStock ? "grayscale" : "group-hover:scale-110"
+          }`}>
+            {item.emoji}
+          </span>
+        )}
+        {!isOutOfStock && !imageUrl && (
           <div className="absolute inset-0 bg-gradient-to-t from-tomato-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         )}
         
         {/* Type badge */}
-        <span className={`absolute top-1.5 left-1.5 sm:top-3 sm:left-3 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full border ${typeColor}`}>
+        <span className={`absolute top-2 left-2 sm:top-3 sm:left-3 px-2 py-1 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full border ${typeColor}`}>
           {typeLabel}
         </span>
 
         {/* Out of stock badge */}
         {isOutOfStock && (
           <div className="absolute inset-0 bg-gray-900/40 flex items-center justify-center">
-            <span className="bg-red-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-full text-[11px] sm:text-sm font-bold shadow-lg">
+            <span className="bg-red-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[11px] sm:text-sm font-bold shadow-lg">
               AGOTADO
             </span>
           </div>
@@ -57,8 +73,8 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
 
         {/* Quick view icon - solo visible en desktop al hacer hover */}
         {!isOutOfStock && (
-          <div className="absolute bottom-1.5 right-1.5 sm:bottom-3 sm:right-3 p-1.5 sm:p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-            <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-tomato-700" />
+          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 p-2 sm:p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tomato-700" />
           </div>
         )}
       </button>

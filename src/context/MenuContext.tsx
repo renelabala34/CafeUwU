@@ -24,6 +24,7 @@ const dbToMenuItem = (row: any): MenuItem => ({
   description: row.description,
   emoji: row.emoji,
   inStock: row.in_stock,
+  imageUrl: row.image_url,
 });
 
 // Función para convertir de formato app a formato DB
@@ -36,6 +37,7 @@ const menuItemToDb = (item: Partial<MenuItem>) => ({
   description: item.description,
   emoji: item.emoji,
   in_stock: item.inStock,
+  image_url: item.imageUrl,
 });
 
 export function MenuProvider({ children }: { children: ReactNode }) {
