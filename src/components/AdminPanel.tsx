@@ -331,7 +331,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         {/* Contenido de la pestaña Productos */}
         {activeTab === 'products' && (
           <>
-            {/* Stats */}
+            {/* Stats - Solo en pestaña Productos */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
               <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
                 <p className="text-xs text-tomato-500 uppercase tracking-wider">Total productos</p>
@@ -370,13 +370,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                   className="w-full pl-10 pr-4 py-2.5 bg-white border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
                 />
               </div>
-              <button
-                onClick={() => openCategoryForm()}
-                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
-              >
-                <FolderKanban className="w-4 h-4" />
-                Crear categoría
-              </button>
               <button
                 onClick={openCreateForm}
                 className="flex items-center justify-center gap-2 px-5 py-2.5 bg-tomato-600 hover:bg-tomato-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
@@ -814,7 +807,34 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
       {/* Contenido de la pestaña Categorías - Lista principal */}
       {activeTab === 'categories' && (
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <>
+          {/* Stats - Solo en pestaña Categorías */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+            {categories.map((cat) => {
+              const count = categoryCounts[cat.type] || 0;
+              return (
+                <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60">
+                  <p className="text-xs text-tomato-500 uppercase tracking-wider">{cat.name}</p>
+                  <p className={`text-2xl font-black mt-1 ${
+                    cat.color === "warm" ? "text-warm-700" :
+                    cat.color === "olive" ? "text-olive-700" :
+                    cat.color === "tomato" ? "text-tomato-700" :
+                    "text-cream-700"
+                  }`}>
+                    {count} {count === 1 ? 'producto' : 'productos'}
+                  </p>
+                </div>
+              );
+            })}
+            {categories.length === 0 && (
+              <div className="col-span-full bg-white rounded-xl p-4 border border-tomato-100/60">
+                <p className="text-xs text-tomato-500 uppercase tracking-wider">Sin categorías</p>
+                <p className="text-2xl font-black mt-1 text-tomato-700">0</p>
+              </div>
+            )}
+          </div>
+
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Toolbar categorías */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
             <div className="relative flex-1">
@@ -828,7 +848,13 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               />
             </div>
             <button
-              onClick={() => openCategoryForm()}
+              onClick={() => {
+                setEditingCategory(null);
+                setCategoryFormData({
+                  ...emptyCategoryForm,
+                  type: `cat_${Date.now()}`,
+                });
+              }}
               className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" />
@@ -891,7 +917,13 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               <p className="text-tomato-700 font-bold mb-2">No hay categorías</p>
               <p className="text-sm text-tomato-500 mb-4">Crea tu primera categoría para organizar los productos</p>
               <button
-                onClick={() => openCategoryForm()}
+                onClick={() => {
+                  setEditingCategory(null);
+                  setCategoryFormData({
+                    ...emptyCategoryForm,
+                    type: `cat_${Date.now()}`,
+                  });
+                }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
               >
                 <Plus className="w-4 h-4" />
@@ -900,6 +932,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </div>
           )}
         </main>
+        </>
       )}
     </div>
   );
