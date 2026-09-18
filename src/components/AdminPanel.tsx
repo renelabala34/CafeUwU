@@ -66,7 +66,7 @@ const emptyForm: ItemForm = {
 const emptyCategoryForm: CategoryForm = {
   name: "",
   description: "",
-  type: "sin_freir",
+  type: "",
   emoji: "📁",
   color: "warm",
 };
@@ -185,7 +185,15 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setCategoryFormData({ ...categoryFormData, [name]: value });
+    let updatedData = { ...categoryFormData, [name]: value };
+    
+    // Auto-generar type cuando se cambia el nombre y no hay un tipo manual
+    if (name === 'name' && !editingCategory) {
+      const autoType = value.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+      updatedData.type = autoType || `cat_${Date.now()}`;
+    }
+    
+    setCategoryFormData(updatedData);
   };
 
   const openCategoryForm = (category?: { id: number; name: string; description: string; type: string; emoji: string; color: string }) => {
@@ -200,7 +208,12 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       });
     } else {
       setEditingCategory(null);
-      setCategoryFormData(emptyCategoryForm);
+      // Generar tipo automáticamente basado en el nombre (sin espacios, minúsculas)
+      const autoType = categoryFormData.name.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+      setCategoryFormData({
+        ...emptyCategoryForm,
+        type: autoType || `cat_${Date.now()}`,
+      });
     }
     setShowCategories(true);
   };
@@ -323,7 +336,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
           >
             <FolderKanban className="w-4 h-4" />
-            Gestionar categorías
+            Crear categoría
           </button>
           <button
             onClick={openCreateForm}
@@ -358,7 +371,90 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
           </button>
         </div>
 
-        {/* Table */}
+        {/* Vista por Categoría */}
+        {viewMode === 'by-category' && (
+          <div className="space-y-6 mb-8">
+            {Object.entries(productsByCategory).map(([type, products]) => {
+              const category = categories.find(c => c.type === type);
+              const categoryName = category?.name || type;
+              const categoryEmoji = category?.emoji || '📂';
+              const categoryColorClass = category?.color === "warm" ? "from-warm-50 to-warm-100 border-warm-200" :
+                                         category?.color === "olive" ? "from-olive-50 to-olive-100 border-olive-200" :
+                                         category?.color === "tomato" ? "from-tomato-50 to-tomato-100 border-tomato-200" :
+                                         "from-cream-50 to-cream-100 border-cream-200";
+              const headerColorClass = category?.color === "warm" ? "bg-warm-500" :
+                                       category?.color === "olive" ? "bg-olive-500" :
+                                       category?.color === "tomato" ? "bg-tomato-500" :
+                                       "bg-cream-500";
+
+              if (products.length === 0) return null;
+
+              return (
+                <div key={type} className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
+                  <div className={`${headerColorClass} px-6 py-4`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{categoryEmoji}</span>
+                        <h3 className="font-black text-white text-lg">{categoryName}</h3>
+                      </div>
+                      <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white text-xs font-bold">
+                        {products.length} {products.length === 1 ? 'producto' : 'productos'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-tomato-100">
+                            <th className="text-left py-2 px-3 text-xs font-bold text-tomato-600 uppercase">Producto</th>
+                            <th className="text-left py-2 px-3 text-xs font-bold text-tomato-600 uppercase">Precio</th>
+                            <th className="text-left py-2 px-3 text-xs font-bold text-tomato-600 uppercase">Stock</th>
+                            <th className="text-right py-2 px-3 text-xs font-bold text-tomato-600 uppercase">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-tomato-50">
+                          {products.map((item) => (
+                            <tr key={item.id} className="hover:bg-cream-50/50">
+                              <td className="py-3 px-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-lg">{item.emoji}</span>
+                                  <span className="font-bold text-tomato-900 text-sm">{item.name}</span>
+                                </div>
+                              </td>
+                              <td className="py-3 px-3 font-black text-tomato-900">${item.price}</td>
+                              <td className="py-3 px-3">
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-full ${
+                                  item.inStock ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                                }`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${item.inStock ? "bg-green-500" : "bg-red-500"}`} />
+                                  {item.inStock ? 'Disp.' : 'Agot.'}
+                                </span>
+                              </td>
+                              <td className="py-3 px-3">
+                                <div className="flex items-center justify-end gap-1">
+                                  <button onClick={() => openEditForm(item)} className="p-1.5 hover:bg-tomato-50 rounded-lg">
+                                    <Edit2 className="w-4 h-4 text-tomato-500" />
+                                  </button>
+                                  <button onClick={() => setDeleteConfirm(item.id)} className="p-1.5 hover:bg-red-50 rounded-lg">
+                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Table - Solo mostrar en vista Lista Completa */}
+        {viewMode === 'list' && (
         <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
@@ -462,6 +558,56 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               <p className="text-tomato-700 font-bold">No hay productos</p>
             </div>
           )}
+        </div>
+        )}
+
+        {/* Lista de Categorías - Siempre visible debajo de las vistas */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <FolderKanban className="w-4 h-4 text-tomato-500" />
+              <span className="text-sm font-bold text-tomato-800">Categorías ({categories.length})</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {categories.map((cat) => {
+              const count = categoryCounts[cat.type] || 0;
+              return (
+                <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60 hover:border-tomato-200 transition-all">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        cat.color === "warm" ? "bg-warm-100" :
+                        cat.color === "olive" ? "bg-olive-100" :
+                        cat.color === "tomato" ? "bg-tomato-100" :
+                        "bg-cream-100"
+                      }`}>
+                        <span className="text-xl">{cat.emoji}</span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-tomato-900 text-sm">{cat.name}</h4>
+                        <p className="text-xs text-tomato-500">{count} {count === 1 ? 'producto' : 'productos'}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      <button onClick={() => openCategoryForm(cat)} className="p-1.5 hover:bg-tomato-50 rounded-lg">
+                        <Edit2 className="w-4 h-4 text-tomato-600" />
+                      </button>
+                      <button 
+                        onClick={() => { if (confirm('¿Eliminar esta categoría?')) handleDeleteCategory(cat.id); }} 
+                        className="p-1.5 hover:bg-red-50 rounded-lg"
+                        disabled={count > 0}
+                        title={count > 0 ? 'Hay productos en esta categoría' : 'Eliminar categoría'}
+                      >
+                        <Trash2 className={`w-4 h-4 ${count > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-red-500'}`} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-tomato-600 mt-2 line-clamp-2">{cat.description}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </main>
 
@@ -607,17 +753,18 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                   className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all resize-none" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-tomato-800 mb-1.5">Tipo *</label>
+                <label className="block text-sm font-bold text-tomato-800 mb-1.5">Tipo (automático)</label>
                 <input 
                   type="text" 
                   name="type" 
                   value={categoryFormData.type} 
                   onChange={handleCategoryChange} 
                   required
-                  placeholder="Ej: sin_freir, preparado, postres, bebidas..."
-                  className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" 
+                  disabled={!editingCategory}
+                  placeholder="Se genera automáticamente al escribir el nombre"
+                  className="w-full px-4 py-2.5 bg-gray-100 border border-tomato-100 rounded-xl text-sm text-gray-600 cursor-not-allowed" 
                 />
-                <p className="text-xs text-tomato-500 mt-1">El tipo se usará como identificador interno (sin espacios ni caracteres especiales)</p>
+                <p className="text-xs text-tomato-500 mt-1">El identificador se genera automáticamente basado en el nombre (solo editable al crear)</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
