@@ -338,25 +338,12 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         {/* Contenido de la pestaña Productos */}
         {activeTab === 'products' && (
           <>
-            {/* Stats - Solo en pestaña Productos */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            {/* Stats - Solo total y disponibles en pestaña Productos */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
                 <p className="text-xs text-tomato-500 uppercase tracking-wider">Total productos</p>
                 <p className="text-2xl font-black text-tomato-900 mt-1">{items.length}</p>
               </div>
-              {categories.map((cat) => (
-                <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60">
-                  <p className="text-xs text-tomato-500 uppercase tracking-wider">{cat.name}</p>
-                  <p className={`text-2xl font-black mt-1 ${
-                    cat.color === "warm" ? "text-warm-700" :
-                    cat.color === "olive" ? "text-olive-700" :
-                    cat.color === "tomato" ? "text-tomato-700" :
-                    "text-cream-700"
-                  }`}>
-                    {categoryCounts[cat.type] || 0}
-                  </p>
-                </div>
-              ))}
               <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
                 <p className="text-xs text-tomato-500 uppercase tracking-wider">Disponibles</p>
                 <p className="text-2xl font-black text-tomato-900 mt-1">
@@ -748,7 +735,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               <input type="hidden" name="type" value={categoryFormData.type} />
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
-                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 bg-cream-50 rounded-xl border border-tomato-100">
+                <div className="flex flex-wrap gap-2 p-2 bg-cream-50 rounded-xl border border-tomato-100">
                   {EMOJIS.map((e) => (
                     <button
                       key={e}
@@ -829,7 +816,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             )}
           </div>
 
-          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Toolbar categorías */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
             <div className="relative flex-1">
@@ -898,9 +884,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                       </div>
                     </div>
                     <p className="text-sm text-tomato-600 line-clamp-2">{cat.description}</p>
-                    <div className="mt-3 pt-3 border-t border-tomato-50">
-                      <span className="text-xs text-tomato-400 font-mono">{cat.type}</span>
-                    </div>
                   </div>
                 );
               })}
@@ -926,7 +909,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </button>
             </div>
           )}
-        </main>
         </>
       )}
     </div>
