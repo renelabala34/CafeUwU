@@ -74,13 +74,13 @@ const emptyCategoryForm: CategoryForm = {
 export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) {
   const { items, addItem, updateItem, deleteItem } = useMenu();
   const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
+  const [activeTab, setActiveTab] = useState<'products' | 'categories'>('products');
   const [searchQuery, setSearchQuery] = useState("");
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<ItemForm>(emptyForm);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [showCategories, setShowCategories] = useState(false);
   const [editingCategory, setEditingCategory] = useState<{ id: number } | null>(null);
   const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
   const [viewMode, setViewMode] = useState<'list' | 'by-category'>('by-category');
@@ -187,8 +187,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     const { name, value } = e.target;
     let updatedData = { ...categoryFormData, [name]: value };
     
-    // Auto-generar type cuando se cambia el nombre y no hay un tipo manual
-    if (name === 'name' && !editingCategory) {
+    // Auto-generar type cuando se cambia el nombre (siempre automático)
+    if (name === 'name') {
       const autoType = value.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
       updatedData.type = autoType || `cat_${Date.now()}`;
     }
@@ -208,14 +208,12 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       });
     } else {
       setEditingCategory(null);
-      // Generar tipo automáticamente basado en el nombre (sin espacios, minúsculas)
-      const autoType = categoryFormData.name.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
       setCategoryFormData({
         ...emptyCategoryForm,
-        type: autoType || `cat_${Date.now()}`,
+        type: `cat_${Date.now()}`,
       });
     }
-    setShowCategories(true);
+    setActiveTab('categories');
   };
 
   const handleCategorySubmit = async (e: React.FormEvent) => {
@@ -225,7 +223,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     } else {
       await addCategory(categoryFormData);
     }
-    setShowCategories(false);
+    setActiveTab('categories');
     setEditingCategory(null);
   };
 
@@ -292,84 +290,113 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
-            <p className="text-xs text-tomato-500 uppercase tracking-wider">Total productos</p>
-            <p className="text-2xl font-black text-tomato-900 mt-1">{items.length}</p>
-          </div>
-          {categories.map((cat) => (
-            <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60">
-              <p className="text-xs text-tomato-500 uppercase tracking-wider">{cat.name}</p>
-              <p className={`text-2xl font-black mt-1 ${
-                cat.color === "warm" ? "text-warm-700" :
-                cat.color === "olive" ? "text-olive-700" :
-                cat.color === "tomato" ? "text-tomato-700" :
-                "text-cream-700"
-              }`}>
-                {categoryCounts[cat.type] || 0}
-              </p>
-            </div>
-          ))}
-          <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
-            <p className="text-xs text-tomato-500 uppercase tracking-wider">Disponibles</p>
-            <p className="text-2xl font-black text-tomato-900 mt-1">
-              {items.filter((i) => i.inStock).length}
-            </p>
-          </div>
-        </div>
-
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tomato-400" />
-            <input
-              type="text"
-              placeholder="Buscar productos..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-            />
-          </div>
+        {/* Pestañas de navegación */}
+        <div className="flex items-center gap-2 mb-6 bg-white p-1.5 rounded-xl border border-tomato-100 w-fit">
           <button
-            onClick={() => openCategoryForm()}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+            onClick={() => setActiveTab('products')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${
+              activeTab === 'products'
+                ? 'bg-tomato-600 text-white shadow-md'
+                : 'text-tomato-600 hover:bg-tomato-50'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            Productos
+          </button>
+          <button
+            onClick={() => setActiveTab('categories')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${
+              activeTab === 'categories'
+                ? 'bg-tomato-600 text-white shadow-md'
+                : 'text-tomato-600 hover:bg-tomato-50'
+            }`}
           >
             <FolderKanban className="w-4 h-4" />
-            Crear categoría
-          </button>
-          <button
-            onClick={openCreateForm}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-tomato-600 hover:bg-tomato-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
-          >
-            <Plus className="w-4 h-4" />
-            Nuevo producto
+            Categorías
           </button>
         </div>
 
-        {/* Toggle Vista */}
-        <div className="flex items-center gap-2 mb-6">
-          <button
-            onClick={() => setViewMode('by-category')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              viewMode === 'by-category'
-                ? 'bg-tomato-600 text-white shadow-md'
-                : 'bg-white text-tomato-600 hover:bg-tomato-50 border border-tomato-100'
-            }`}
-          >
-            Por Categoría
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              viewMode === 'list'
-                ? 'bg-tomato-600 text-white shadow-md'
-                : 'bg-white text-tomato-600 hover:bg-tomato-50 border border-tomato-100'
-            }`}
-          >
-            Lista Completa
-          </button>
-        </div>
+        {/* Contenido de la pestaña Productos */}
+        {activeTab === 'products' && (
+          <>
+            {/* Stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+              <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
+                <p className="text-xs text-tomato-500 uppercase tracking-wider">Total productos</p>
+                <p className="text-2xl font-black text-tomato-900 mt-1">{items.length}</p>
+              </div>
+              {categories.map((cat) => (
+                <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60">
+                  <p className="text-xs text-tomato-500 uppercase tracking-wider">{cat.name}</p>
+                  <p className={`text-2xl font-black mt-1 ${
+                    cat.color === "warm" ? "text-warm-700" :
+                    cat.color === "olive" ? "text-olive-700" :
+                    cat.color === "tomato" ? "text-tomato-700" :
+                    "text-cream-700"
+                  }`}>
+                    {categoryCounts[cat.type] || 0}
+                  </p>
+                </div>
+              ))}
+              <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
+                <p className="text-xs text-tomato-500 uppercase tracking-wider">Disponibles</p>
+                <p className="text-2xl font-black text-tomato-900 mt-1">
+                  {items.filter((i) => i.inStock).length}
+                </p>
+              </div>
+            </div>
+
+            {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tomato-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar productos..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
+                />
+              </div>
+              <button
+                onClick={() => openCategoryForm()}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+              >
+                <FolderKanban className="w-4 h-4" />
+                Crear categoría
+              </button>
+              <button
+                onClick={openCreateForm}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-tomato-600 hover:bg-tomato-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+              >
+                <Plus className="w-4 h-4" />
+                Nuevo producto
+              </button>
+            </div>
+
+            {/* Toggle Vista */}
+            <div className="flex items-center gap-2 mb-6">
+              <button
+                onClick={() => setViewMode('by-category')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                  viewMode === 'by-category'
+                    ? 'bg-tomato-600 text-white shadow-md'
+                    : 'bg-white text-tomato-600 hover:bg-tomato-50 border border-tomato-100'
+                }`}
+              >
+                Por Categoría
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                  viewMode === 'list'
+                    ? 'bg-tomato-600 text-white shadow-md'
+                    : 'bg-white text-tomato-600 hover:bg-tomato-50 border border-tomato-100'
+                }`}
+              >
+                Lista Completa
+              </button>
+            </div>
 
         {/* Vista por Categoría */}
         {viewMode === 'by-category' && (
@@ -560,55 +587,99 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
           )}
         </div>
         )}
+          </>
+        )}
 
-        {/* Lista de Categorías - Siempre visible debajo de las vistas */}
-        <div className="mt-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <FolderKanban className="w-4 h-4 text-tomato-500" />
-              <span className="text-sm font-bold text-tomato-800">Categorías ({categories.length})</span>
+        {/* Contenido de la pestaña Categorías */}
+        {activeTab === 'categories' && (
+          <div>
+            {/* Toolbar categorías */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tomato-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar categorías..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
+                />
+              </div>
+              <button
+                onClick={() => openCategoryForm()}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+              >
+                <Plus className="w-4 h-4" />
+                Nueva categoría
+              </button>
             </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {categories.map((cat) => {
-              const count = categoryCounts[cat.type] || 0;
-              return (
-                <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60 hover:border-tomato-200 transition-all">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        cat.color === "warm" ? "bg-warm-100" :
-                        cat.color === "olive" ? "bg-olive-100" :
-                        cat.color === "tomato" ? "bg-tomato-100" :
-                        "bg-cream-100"
-                      }`}>
-                        <span className="text-xl">{cat.emoji}</span>
+
+            {/* Grid de categorías */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {categories
+                .filter(cat => 
+                  searchQuery === "" || 
+                  cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  cat.description.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map((cat) => {
+                  const count = categoryCounts[cat.type] || 0;
+                  return (
+                    <div key={cat.id} className="bg-white rounded-xl p-5 border border-tomato-100/60 hover:border-tomato-200 hover:shadow-md transition-all">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                            cat.color === "warm" ? "bg-warm-100" :
+                            cat.color === "olive" ? "bg-olive-100" :
+                            cat.color === "tomato" ? "bg-tomato-100" :
+                            "bg-cream-100"
+                          }`}>
+                            <span className="text-2xl">{cat.emoji}</span>
+                          </div>
+                          <div>
+                            <h4 className="font-black text-tomato-900 text-base">{cat.name}</h4>
+                            <p className="text-xs text-tomato-500 font-semibold">{count} {count === 1 ? 'producto' : 'productos'}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <button onClick={() => openCategoryForm(cat)} className="p-2 hover:bg-tomato-50 rounded-lg transition-colors">
+                            <Edit2 className="w-4 h-4 text-tomato-600" />
+                          </button>
+                          <button 
+                            onClick={() => { if (confirm('¿Eliminar esta categoría?')) handleDeleteCategory(cat.id); }} 
+                            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                            disabled={count > 0}
+                            title={count > 0 ? 'Hay productos en esta categoría' : 'Eliminar categoría'}
+                          >
+                            <Trash2 className={`w-4 h-4 ${count > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-red-500'}`} />
+                          </button>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-bold text-tomato-900 text-sm">{cat.name}</h4>
-                        <p className="text-xs text-tomato-500">{count} {count === 1 ? 'producto' : 'productos'}</p>
+                      <p className="text-sm text-tomato-600 line-clamp-2">{cat.description}</p>
+                      <div className="mt-3 pt-3 border-t border-tomato-50">
+                        <span className="text-xs text-tomato-400 font-mono">{cat.type}</span>
                       </div>
                     </div>
-                    <div className="flex gap-1">
-                      <button onClick={() => openCategoryForm(cat)} className="p-1.5 hover:bg-tomato-50 rounded-lg">
-                        <Edit2 className="w-4 h-4 text-tomato-600" />
-                      </button>
-                      <button 
-                        onClick={() => { if (confirm('¿Eliminar esta categoría?')) handleDeleteCategory(cat.id); }} 
-                        className="p-1.5 hover:bg-red-50 rounded-lg"
-                        disabled={count > 0}
-                        title={count > 0 ? 'Hay productos en esta categoría' : 'Eliminar categoría'}
-                      >
-                        <Trash2 className={`w-4 h-4 ${count > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-red-500'}`} />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-tomato-600 mt-2 line-clamp-2">{cat.description}</p>
-                </div>
-              );
-            })}
+                  );
+                })}
+            </div>
+
+            {categories.length === 0 && (
+              <div className="p-12 text-center">
+                <FolderKanban className="w-10 h-10 text-tomato-300 mx-auto mb-3" />
+                <p className="text-tomato-700 font-bold mb-2">No hay categorías</p>
+                <p className="text-sm text-tomato-500 mb-4">Crea tu primera categoría para organizar los productos</p>
+                <button
+                  onClick={() => openCategoryForm()}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+                >
+                  <Plus className="w-4 h-4" />
+                  Crear primera categoría
+                </button>
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </main>
 
       {/* Form Modal */}
