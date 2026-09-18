@@ -48,7 +48,7 @@ function ShopContent() {
   }, []);
 
   const filteredItems = useMemo(() => {
-    return items.filter((item) => {
+    const filtered = items.filter((item) => {
       const matchesSearch =
         searchQuery === "" ||
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -56,6 +56,24 @@ function ShopContent() {
       const matchesSection =
         selectedSection === "todos" || item.type === selectedSection;
       return matchesSearch && matchesSection;
+    });
+    
+    // Ordenar: productos nuevos (menos de 24 horas) primero, luego por id descendente
+    return filtered.sort((a, b) => {
+      const now = new Date();
+      const isNewA = a.createdAt && ((now.getTime() - new Date(a.createdAt).getTime()) / (1000 * 60 * 60)) < 24;
+      const isNewB = b.createdAt && ((now.getTime() - new Date(b.createdAt).getTime()) / (1000 * 60 * 60)) < 24;
+      
+      if (isNewA && !isNewB) return -1;
+      if (!isNewA && isNewB) return 1;
+      
+      // Si ambos son nuevos o ambos no lo son, ordenar por fecha de creación (más reciente primero)
+      if (a.createdAt && b.createdAt) {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      
+      // Fallback: ordenar por id descendente
+      return b.id - a.id;
     });
   }, [searchQuery, selectedSection, items]);
 
