@@ -601,97 +601,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         )}
           </>
         )}
-
-        {/* Contenido de la pestaña Categorías */}
-        {activeTab === 'categories' && (
-          <div>
-            {/* Toolbar categorías */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tomato-400" />
-                <input
-                  type="text"
-                  placeholder="Buscar categorías..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
-                />
-              </div>
-              <button
-                onClick={() => openCategoryForm()}
-                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
-              >
-                <Plus className="w-4 h-4" />
-                Nueva categoría
-              </button>
-            </div>
-
-            {/* Grid de categorías */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {categories
-                .filter(cat => 
-                  searchQuery === "" || 
-                  cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  cat.description.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map((cat) => {
-                  const count = categoryCounts[cat.type] || 0;
-                  return (
-                    <div key={cat.id} className="bg-white rounded-xl p-5 border border-tomato-100/60 hover:border-tomato-200 hover:shadow-md transition-all">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                            cat.color === "warm" ? "bg-warm-100" :
-                            cat.color === "olive" ? "bg-olive-100" :
-                            cat.color === "tomato" ? "bg-tomato-100" :
-                            "bg-cream-100"
-                          }`}>
-                            <span className="text-2xl">{cat.emoji}</span>
-                          </div>
-                          <div>
-                            <h4 className="font-black text-tomato-900 text-base">{cat.name}</h4>
-                            <p className="text-xs text-tomato-500 font-semibold">{count} {count === 1 ? 'producto' : 'productos'}</p>
-                          </div>
-                        </div>
-                        <div className="flex gap-1">
-                          <button onClick={() => openCategoryForm(cat)} className="p-2 hover:bg-tomato-50 rounded-lg transition-colors">
-                            <Edit2 className="w-4 h-4 text-tomato-600" />
-                          </button>
-                          <button 
-                            onClick={() => { if (confirm('¿Eliminar esta categoría?')) handleDeleteCategory(cat.id); }} 
-                            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                            disabled={count > 0}
-                            title={count > 0 ? 'Hay productos en esta categoría' : 'Eliminar categoría'}
-                          >
-                            <Trash2 className={`w-4 h-4 ${count > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-red-500'}`} />
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-sm text-tomato-600 line-clamp-2">{cat.description}</p>
-                      <div className="mt-3 pt-3 border-t border-tomato-50">
-                        <span className="text-xs text-tomato-400 font-mono">{cat.type}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-
-            {categories.length === 0 && (
-              <div className="p-12 text-center">
-                <FolderKanban className="w-10 h-10 text-tomato-300 mx-auto mb-3" />
-                <p className="text-tomato-700 font-bold mb-2">No hay categorías</p>
-                <p className="text-sm text-tomato-500 mb-4">Crea tu primera categoría para organizar los productos</p>
-                <button
-                  onClick={() => openCategoryForm()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
-                >
-                  <Plus className="w-4 h-4" />
-                  Crear primera categoría
-                </button>
-              </div>
-            )}
-          </div>
-        )}
       </main>
 
       {/* Form Modal */}
@@ -811,16 +720,16 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}
 
-      {/* Categories Management Modal */}
-      {showCategories && (
+      {/* Category Form Modal */}
+      {activeTab === 'categories' && editingCategory !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setShowCategories(false)} />
+          <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setEditingCategory(null)} />
           <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
             <div className="sticky top-0 bg-white border-b border-tomato-100 px-6 py-4 flex items-center justify-between rounded-t-3xl z-10">
               <h2 className="text-lg font-black text-tomato-900">
                 {editingCategory ? "Editar categoría" : "Nueva categoría"}
               </h2>
-              <button onClick={() => setShowCategories(false)} className="p-2 hover:bg-tomato-50 rounded-full">
+              <button onClick={() => setEditingCategory(null)} className="p-2 hover:bg-tomato-50 rounded-full">
                 <X className="w-5 h-5 text-tomato-600" />
               </button>
             </div>
@@ -888,7 +797,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 </div>
               </div>
               <div className="flex gap-3 pt-4 border-t border-tomato-100">
-                <button type="button" onClick={() => setShowCategories(false)}
+                <button type="button" onClick={() => setEditingCategory(null)}
                   className="flex-1 py-3 border border-tomato-200 text-tomato-700 font-bold rounded-xl hover:bg-tomato-50 transition-all">
                   Cancelar
                 </button>
@@ -903,44 +812,95 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         </div>
       )}
 
-      {/* Categories List Modal - Show existing categories */}
-      {!showCategories && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ display: 'none' }} />
-      )}
-
-      {/* Category List in Main Panel */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-4">
-          <FolderKanban className="w-4 h-4 text-tomato-500" />
-          <span className="text-sm font-bold text-tomato-800">Categorías ({categories.length})</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {categories.map((cat) => (
-            <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60 hover:border-tomato-200 transition-all">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center">
-                    <span className="text-xl">{cat.emoji}</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-tomato-900 text-sm">{cat.name}</h4>
-                    <p className="text-xs text-tomato-500">{cat.type}</p>
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  <button onClick={() => openCategoryForm(cat)} className="p-1.5 hover:bg-tomato-50 rounded-lg">
-                    <Edit2 className="w-4 h-4 text-tomato-600" />
-                  </button>
-                  <button onClick={() => { if (confirm('¿Eliminar esta categoría?')) handleDeleteCategory(cat.id); }} className="p-1.5 hover:bg-red-50 rounded-lg">
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </button>
-                </div>
-              </div>
-              <p className="text-xs text-tomato-600 mt-2 line-clamp-2">{cat.description}</p>
+      {/* Contenido de la pestaña Categorías - Lista principal */}
+      {activeTab === 'categories' && (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          {/* Toolbar categorías */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tomato-400" />
+              <input
+                type="text"
+                placeholder="Buscar categorías..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
+              />
             </div>
-          ))}
-        </div>
-      </div>
+            <button
+              onClick={() => openCategoryForm()}
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+            >
+              <Plus className="w-4 h-4" />
+              Nueva categoría
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {categories
+              .filter(cat => 
+                searchQuery === "" || 
+                cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                cat.description.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((cat) => {
+                const count = categoryCounts[cat.type] || 0;
+                return (
+                  <div key={cat.id} className="bg-white rounded-xl p-5 border border-tomato-100/60 hover:border-tomato-200 hover:shadow-md transition-all">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          cat.color === "warm" ? "bg-warm-100" :
+                          cat.color === "olive" ? "bg-olive-100" :
+                          cat.color === "tomato" ? "bg-tomato-100" :
+                          "bg-cream-100"
+                        }`}>
+                          <span className="text-2xl">{cat.emoji}</span>
+                        </div>
+                        <div>
+                          <h4 className="font-black text-tomato-900 text-base">{cat.name}</h4>
+                          <p className="text-xs text-tomato-500 font-semibold">{count} {count === 1 ? 'producto' : 'productos'}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <button onClick={() => openCategoryForm(cat)} className="p-2 hover:bg-tomato-50 rounded-lg transition-colors">
+                          <Edit2 className="w-4 h-4 text-tomato-600" />
+                        </button>
+                        <button 
+                          onClick={() => { if (confirm('¿Eliminar esta categoría?')) handleDeleteCategory(cat.id); }} 
+                          className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                          disabled={count > 0}
+                          title={count > 0 ? 'Hay productos en esta categoría' : 'Eliminar categoría'}
+                        >
+                          <Trash2 className={`w-4 h-4 ${count > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-red-500'}`} />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-tomato-600 line-clamp-2">{cat.description}</p>
+                    <div className="mt-3 pt-3 border-t border-tomato-50">
+                      <span className="text-xs text-tomato-400 font-mono">{cat.type}</span>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+
+          {categories.length === 0 && (
+            <div className="p-12 text-center">
+              <FolderKanban className="w-10 h-10 text-tomato-300 mx-auto mb-3" />
+              <p className="text-tomato-700 font-bold mb-2">No hay categorías</p>
+              <p className="text-sm text-tomato-500 mb-4">Crea tu primera categoría para organizar los productos</p>
+              <button
+                onClick={() => openCategoryForm()}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+              >
+                <Plus className="w-4 h-4" />
+                Crear primera categoría
+              </button>
+            </div>
+          )}
+        </main>
+      )}
     </div>
   );
 }
