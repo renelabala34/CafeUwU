@@ -79,7 +79,12 @@ function ShopContent() {
     }
     return (
       <AdminPanel
-        onLogout={() => { sessionStorage.removeItem("admin_auth"); setIsAuthenticated(false); setPage("shop"); }}
+        onLogout={() => { 
+          sessionStorage.removeItem("admin_auth"); 
+          sessionStorage.removeItem("admin_username"); 
+          setIsAuthenticated(false); 
+          setPage("shop"); 
+        }}
         onBackToShop={() => setPage("shop")}
       />
     );
