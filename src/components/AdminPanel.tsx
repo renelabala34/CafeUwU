@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
 import { useMenu } from "../context/MenuContext";
+import { useCategories } from "../context/CategoryContext";
 import { MenuItem } from "../data/menu";
 import {
-  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save, Key,
+  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save, Key, FolderKanban,
 } from "lucide-react";
 import ChangePassword from "./ChangePassword";
 
@@ -11,15 +12,17 @@ interface AdminPanelProps {
   onBackToShop: () => void;
 }
 
-const SECTIONS = [
-  { value: "sin_freir", label: "Ofertas sin freír" },
-  { value: "preparado", label: "Especial I'MAS — Preparados" },
-];
-
 const EMOJIS = [
   "🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", "🍖", "🥩", "🍕", "🌮",
   "🍤", "🥘", "🍲", "🥙", "🍛", "🍝", "🥐", "🥖", "🫓", "🧈", "🥚",
   "🥗", "🫘", "🍚", "🥄", "🍴", "🥢", "🧂", "🌶️", "🧄", "🧅"
+];
+
+const CATEGORY_COLORS = [
+  { value: "warm", label: "Cálido", class: "bg-warm-100 text-warm-700" },
+  { value: "olive", label: "Oliva", class: "bg-olive-100 text-olive-700" },
+  { value: "tomato", label: "Tomate", class: "bg-tomato-100 text-tomato-700" },
+  { value: "cream", label: "Crema", class: "bg-cream-100 text-cream-700" },
 ];
 
 interface ItemForm {
@@ -33,6 +36,14 @@ interface ItemForm {
   inStock: boolean;
 }
 
+interface CategoryForm {
+  name: string;
+  description: string;
+  type: "sin_freir" | "preparado";
+  emoji: string;
+  color: string;
+}
+
 const emptyForm: ItemForm = {
   name: "",
   section: "sin_freir",
@@ -44,14 +55,26 @@ const emptyForm: ItemForm = {
   inStock: true,
 };
 
+const emptyCategoryForm: CategoryForm = {
+  name: "",
+  description: "",
+  type: "sin_freir",
+  emoji: "📁",
+  color: "warm",
+};
+
 export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) {
   const { items, addItem, updateItem, deleteItem } = useMenu();
+  const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
   const [searchQuery, setSearchQuery] = useState("");
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<ItemForm>(emptyForm);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showCategories, setShowCategories] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<{ id: number } | null>(null);
+  const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
 
   const filtered = items.filter(
     (i) =>
@@ -124,6 +147,45 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         setFormData({ ...formData, [name]: value });
       }
     }
+  };
+
+  const handleCategoryChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setCategoryFormData({ ...categoryFormData, [name]: value });
+  };
+
+  const openCategoryForm = (category?: { id: number; name: string; description: string; type: "sin_freir" | "preparado"; emoji: string; color: string }) => {
+    if (category) {
+      setEditingCategory({ id: category.id });
+      setCategoryFormData({
+        name: category.name,
+        description: category.description,
+        type: category.type,
+        emoji: category.emoji,
+        color: category.color,
+      });
+    } else {
+      setEditingCategory(null);
+      setCategoryFormData(emptyCategoryForm);
+    }
+    setShowCategories(true);
+  };
+
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingCategory) {
+      await updateCategory(editingCategory.id, categoryFormData);
+    } else {
+      await addCategory(categoryFormData);
+    }
+    setShowCategories(false);
+    setEditingCategory(null);
+  };
+
+  const handleDeleteCategory = async (id: number) => {
+    await deleteCategory(id);
   };
 
   const sinFreirCount = items.filter((i) => i.type === "sin_freir").length;
@@ -199,6 +261,13 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               className="w-full pl-10 pr-4 py-2.5 bg-white border border-tomato-100 rounded-xl text-sm text-tomato-900 placeholder:text-tomato-300 focus:outline-none focus:ring-2 focus:ring-warm-400/50 focus:border-warm-400 transition-all"
             />
           </div>
+          <button
+            onClick={() => openCategoryForm()}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+          >
+            <FolderKanban className="w-4 h-4" />
+            Gestionar categorías
+          </button>
           <button
             onClick={openCreateForm}
             className="flex items-center justify-center gap-2 px-5 py-2.5 bg-tomato-600 hover:bg-tomato-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
@@ -335,8 +404,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Sección *</label>
                   <select name="section" value={formData.section} onChange={handleChange}
                     className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all">
-                    {SECTIONS.map((s) => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.type}>{cat.name}</option>
                     ))}
                   </select>
                 </div>
@@ -426,6 +495,131 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       {showChangePassword && (
         <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}
+
+      {/* Categories Management Modal */}
+      {showCategories && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setShowCategories(false)} />
+          <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
+            <div className="sticky top-0 bg-white border-b border-tomato-100 px-6 py-4 flex items-center justify-between rounded-t-3xl z-10">
+              <h2 className="text-lg font-black text-tomato-900">
+                {editingCategory ? "Editar categoría" : "Nueva categoría"}
+              </h2>
+              <button onClick={() => setShowCategories(false)} className="p-2 hover:bg-tomato-50 rounded-full">
+                <X className="w-5 h-5 text-tomato-600" />
+              </button>
+            </div>
+            <form onSubmit={handleCategorySubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-tomato-800 mb-1.5">Nombre *</label>
+                <input type="text" name="name" value={categoryFormData.name} onChange={handleCategoryChange} required
+                  className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-tomato-800 mb-1.5">Descripción *</label>
+                <textarea name="description" value={categoryFormData.description} onChange={handleCategoryChange} required rows={2}
+                  className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all resize-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-tomato-800 mb-1.5">Tipo *</label>
+                <select name="type" value={categoryFormData.type} onChange={handleCategoryChange}
+                  className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all">
+                  <option value="sin_freir">Sin freír</option>
+                  <option value="preparado">Preparado</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
+                <div className="flex flex-wrap gap-2">
+                  {["📁", "🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", "🍕", "🌮", "🍤", "🥘"].map((e) => (
+                    <button
+                      key={e}
+                      type="button"
+                      onClick={() => setCategoryFormData({ ...categoryFormData, emoji: e })}
+                      className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all ${
+                        categoryFormData.emoji === e
+                          ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
+                          : "bg-cream-50 hover:bg-cream-100"
+                      }`}
+                    >
+                      {e}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-tomato-800 mb-1.5">Color</label>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORY_COLORS.map((c) => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setCategoryFormData({ ...categoryFormData, color: c.value })}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                        categoryFormData.color === c.value
+                          ? c.class + " ring-2 ring-tomato-500"
+                          : "bg-cream-50 text-tomato-600 hover:bg-cream-100"
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-3 pt-4 border-t border-tomato-100">
+                <button type="button" onClick={() => setShowCategories(false)}
+                  className="flex-1 py-3 border border-tomato-200 text-tomato-700 font-bold rounded-xl hover:bg-tomato-50 transition-all">
+                  Cancelar
+                </button>
+                <button type="submit"
+                  className="flex-1 py-3 bg-tomato-600 hover:bg-tomato-700 text-white font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
+                  <Save className="w-4 h-4" />
+                  {editingCategory ? "Guardar" : "Crear"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Categories List Modal - Show existing categories */}
+      {!showCategories && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ display: 'none' }} />
+      )}
+
+      {/* Category List in Main Panel */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <FolderKanban className="w-4 h-4 text-tomato-500" />
+          <span className="text-sm font-bold text-tomato-800">Categorías ({categories.length})</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {categories.map((cat) => (
+            <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60 hover:border-tomato-200 transition-all">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center">
+                    <span className="text-xl">{cat.emoji}</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-tomato-900 text-sm">{cat.name}</h4>
+                    <p className="text-xs text-tomato-500">{cat.type === "sin_freir" ? "Sin freír" : "Preparado"}</p>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <button onClick={() => openCategoryForm(cat)} className="p-1.5 hover:bg-tomato-50 rounded-lg">
+                    <Edit2 className="w-4 h-4 text-tomato-600" />
+                  </button>
+                  <button onClick={() => { if (confirm('¿Eliminar esta categoría?')) handleDeleteCategory(cat.id); }} className="p-1.5 hover:bg-red-50 rounded-lg">
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
+                </div>
+              </div>
+              <p className="text-xs text-tomato-600 mt-2 line-clamp-2">{cat.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

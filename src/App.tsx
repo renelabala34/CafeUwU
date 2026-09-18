@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { CartProvider } from "./context/CartContext";
 import { MenuProvider, useMenu } from "./context/MenuContext";
-import { sections, businessInfo, MenuItem } from "./data/menu";
+import { CategoryProvider, useCategories } from "./context/CategoryContext";
+import { defaultSections, MenuItem } from "./data/menu";
 import Header from "./components/Header";
 import MenuItemCard from "./components/MenuItemCard";
 import MenuItemDetail from "./components/MenuItemDetail";
@@ -16,6 +17,7 @@ type Page = "shop" | "checkout" | "admin-login" | "admin-panel";
 
 function ShopContent() {
   const { items } = useMenu();
+  const { categories } = useCategories();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSection, setSelectedSection] = useState("todos");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -46,6 +48,18 @@ function ShopContent() {
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
+
+  // Secciones disponibles: "todos" + categorías dinámicas
+  const availableSections = useMemo(() => {
+    return [
+      { id: "todos", name: "Todos", description: "" },
+      ...categories.map((cat) => ({
+        id: cat.type,
+        name: cat.name,
+        description: cat.description,
+      })),
+    ];
+  }, [categories]);
 
   const filteredItems = useMemo(() => {
     const filtered = items.filter((item) => {
@@ -182,7 +196,7 @@ function ShopContent() {
             <span className="text-sm font-bold text-tomato-800">Categorías</span>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
-            {sections.map((section) => (
+            {availableSections.map((section) => (
               <button
                 key={section.id}
                 onClick={() => setSelectedSection(section.id)}
@@ -313,10 +327,12 @@ function ShopContent() {
 
 export default function App() {
   return (
-    <MenuProvider>
-      <CartProvider>
-        <ShopContent />
-      </CartProvider>
-    </MenuProvider>
+    <CategoryProvider>
+      <MenuProvider>
+        <CartProvider>
+          <ShopContent />
+        </CartProvider>
+      </MenuProvider>
+    </CategoryProvider>
   );
 }
