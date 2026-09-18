@@ -24,6 +24,7 @@ const dbToMenuItem = (row: any): MenuItem => ({
   description: row.description,
   emoji: row.emoji,
   inStock: row.in_stock,
+  createdAt: row.created_at,
 });
 
 // Función para convertir de formato app a formato DB
@@ -36,6 +37,7 @@ const menuItemToDb = (item: Partial<MenuItem>) => ({
   description: item.description,
   emoji: item.emoji,
   in_stock: item.inStock,
+  created_at: item.createdAt,
 });
 
 export function MenuProvider({ children }: { children: ReactNode }) {
@@ -101,6 +103,9 @@ export function MenuProvider({ children }: { children: ReactNode }) {
   }, [items]);
 
   const addItem = async (item: Omit<MenuItem, "id">) => {
+    const now = new Date().toISOString();
+    const itemWithTimestamp = { ...item, createdAt: now };
+    
     if (supabase) {
       try {
         // Primero verificar si ya existe un producto con el mismo nombre, sección y tipo
@@ -119,7 +124,7 @@ export function MenuProvider({ children }: { children: ReactNode }) {
 
         const { data, error } = await supabase
           .from('menu_items')
-          .insert([menuItemToDb(item)])
+          .insert([menuItemToDb(itemWithTimestamp)])
           .select()
           .single();
 
@@ -129,11 +134,11 @@ export function MenuProvider({ children }: { children: ReactNode }) {
         console.error('Error adding item:', error);
         // Fallback local
         const newId = Math.max(...items.map((i) => i.id), 0) + 1;
-        setItems((prev) => [...prev, { ...item, id: newId }]);
+        setItems((prev) => [...prev, { ...itemWithTimestamp, id: newId }]);
       }
     } else {
       const newId = Math.max(...items.map((i) => i.id), 0) + 1;
-      setItems((prev) => [...prev, { ...item, id: newId }]);
+      setItems((prev) => [...prev, { ...itemWithTimestamp, id: newId }]);
     }
   };
 
