@@ -49,6 +49,7 @@ interface CategoryForm {
   description: string;
   emoji: string;
   color: string;
+  type?: string;
 }
 
 const emptyForm: ItemForm = {
@@ -195,25 +196,27 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    if (name === 'type') return; // No permitir cambios manuales al campo type
     setCategoryFormData({ ...categoryFormData, [name]: value });
   };
 
   const openCategoryForm = (category?: { id: number; name: string; description: string; type: string; emoji: string; color: string }) => {
     if (category) {
       setEditingCategory({ id: category.id });
-      // Generar el type automáticamente basado en el nombre para edición
       const autoType = category.name.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') || category.type;
       setCategoryFormData({
         name: category.name,
         description: category.description,
         emoji: category.emoji,
         color: category.color,
+        type: autoType,
       });
-      // Establecer el type generado en un estado temporal que se usará al guardar
-      setCategoryFormData(prev => ({ ...prev, type: autoType }));
     } else {
       setEditingCategory({ id: -1 });
-      setCategoryFormData(emptyCategoryForm);
+      setCategoryFormData({
+        ...emptyCategoryForm,
+        type: `cat_${Date.now()}`,
+      });
     }
     setActiveTab('categories');
   };
@@ -223,21 +226,25 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     
     // Generar el type automáticamente basado en el nombre al guardar
     const autoType = categoryFormData.name.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') || `cat_${Date.now()}`;
-    const categoryDataWithAutoType = { ...categoryFormData, type: autoType };
+    const categoryDataWithAutoType = { 
+      name: categoryFormData.name,
+      description: categoryFormData.description,
+      emoji: categoryFormData.emoji,
+      color: categoryFormData.color,
+      type: autoType
+    };
     
     console.log('Guardando categoría:', categoryDataWithAutoType, 'editingCategory:', editingCategory);
     try {
-      if (editingCategory) {
+      if (editingCategory && editingCategory.id !== -1) {
         await updateCategory(editingCategory.id, categoryDataWithAutoType);
       } else {
         await addCategory(categoryDataWithAutoType);
       }
       setEditingCategory(null);
       setCategoryFormData(emptyCategoryForm);
-      alert('Categoría guardada exitosamente');
     } catch (error) {
       console.error('Error al guardar categoría:', error);
-      alert('Error al guardar la categoría. Revisa la consola para más detalles.');
     }
   };
 
@@ -817,13 +824,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               />
             </div>
             <button
-              onClick={() => {
-                setEditingCategory({ id: -1 });
-                setCategoryFormData({
-                  ...emptyCategoryForm,
-                  type: `cat_${Date.now()}`,
-                });
-              }}
+              onClick={() => openCategoryForm()}
               className="flex items-center justify-center gap-2 px-5 py-2.5 bg-warm-600 hover:bg-warm-700 text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" />
