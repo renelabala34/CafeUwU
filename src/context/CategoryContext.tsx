@@ -8,7 +8,6 @@ export interface Category {
   type: string;
   emoji: string;
   color: string;
-  createdAt?: string;
 }
 
 interface CategoryContextType {
@@ -28,7 +27,6 @@ const categoryToDb = (category: Partial<Category>) => ({
   type: category.type,
   emoji: category.emoji,
   color: category.color,
-  created_at: category.createdAt,
 });
 
 const dbToCategory = (row: any): Category => ({
@@ -38,7 +36,6 @@ const dbToCategory = (row: any): Category => ({
   type: row.type,
   emoji: row.emoji,
   color: row.color,
-  createdAt: row.created_at,
 });
 
 export function CategoryProvider({ children }: { children: ReactNode }) {
@@ -116,9 +113,6 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
   }, [categories]);
 
   const addCategory = async (category: Omit<Category, "id">) => {
-    const now = new Date().toISOString();
-    const categoryWithTimestamp = { ...category, createdAt: now };
-    
     if (supabase) {
       try {
         // Verificar si ya existe una categoría con ese nombre o type
@@ -135,7 +129,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
 
         const { data, error } = await supabase
           .from('categories')
-          .insert([categoryToDb(categoryWithTimestamp)])
+          .insert([categoryToDb(category)])
           .select()
           .single();
 
@@ -146,16 +140,16 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         // Si el error es porque la tabla no existe, usar fallback local
         if (error?.message?.includes('relation') || error?.message?.includes('does not exist')) {
           const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
-          setCategories((prev) => [...prev, { ...categoryWithTimestamp, id: newId }]);
+          setCategories((prev) => [...prev, { ...category, id: newId }]);
           alert('La tabla categories no existe en Supabase. La categoría se guardó localmente.');
         } else {
           const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
-          setCategories((prev) => [...prev, { ...categoryWithTimestamp, id: newId }]);
+          setCategories((prev) => [...prev, { ...category, id: newId }]);
         }
       }
     } else {
       const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
-      setCategories((prev) => [...prev, { ...categoryWithTimestamp, id: newId }]);
+      setCategories((prev) => [...prev, { ...category, id: newId }]);
     }
   };
 

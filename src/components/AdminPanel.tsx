@@ -47,7 +47,6 @@ interface ItemForm {
 interface CategoryForm {
   name: string;
   description: string;
-  type: string;
   emoji: string;
   color: string;
 }
@@ -66,7 +65,6 @@ const emptyForm: ItemForm = {
 const emptyCategoryForm: CategoryForm = {
   name: "",
   description: "",
-  type: "",
   emoji: "📁",
   color: "warm",
 };
@@ -197,46 +195,42 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    let updatedData = { ...categoryFormData, [name]: value };
-    
-    // Auto-generar type cuando se cambia el nombre (siempre automático)
-    if (name === 'name') {
-      const autoType = value.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-      updatedData.type = autoType || `cat_${Date.now()}`;
-    }
-    
-    setCategoryFormData(updatedData);
+    setCategoryFormData({ ...categoryFormData, [name]: value });
   };
 
   const openCategoryForm = (category?: { id: number; name: string; description: string; type: string; emoji: string; color: string }) => {
     if (category) {
       setEditingCategory({ id: category.id });
+      // Generar el type automáticamente basado en el nombre para edición
+      const autoType = category.name.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') || category.type;
       setCategoryFormData({
         name: category.name,
         description: category.description,
-        type: category.type,
         emoji: category.emoji,
         color: category.color,
       });
+      // Establecer el type generado en un estado temporal que se usará al guardar
+      setCategoryFormData(prev => ({ ...prev, type: autoType }));
     } else {
       setEditingCategory({ id: -1 });
-      const autoType = `cat_${Date.now()}`;
-      setCategoryFormData({
-        ...emptyCategoryForm,
-        type: autoType,
-      });
+      setCategoryFormData(emptyCategoryForm);
     }
     setActiveTab('categories');
   };
 
   const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Guardando categoría:', categoryFormData, 'editingCategory:', editingCategory);
+    
+    // Generar el type automáticamente basado en el nombre al guardar
+    const autoType = categoryFormData.name.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') || `cat_${Date.now()}`;
+    const categoryDataWithAutoType = { ...categoryFormData, type: autoType };
+    
+    console.log('Guardando categoría:', categoryDataWithAutoType, 'editingCategory:', editingCategory);
     try {
       if (editingCategory) {
-        await updateCategory(editingCategory.id, categoryFormData);
+        await updateCategory(editingCategory.id, categoryDataWithAutoType);
       } else {
-        await addCategory(categoryFormData);
+        await addCategory(categoryDataWithAutoType);
       }
       setEditingCategory(null);
       setCategoryFormData(emptyCategoryForm);
@@ -727,8 +721,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 <textarea name="description" value={categoryFormData.description} onChange={handleCategoryChange} required rows={2}
                   className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all resize-none" />
               </div>
-              {/* Campo tipo oculto - es un identificador técnico para la base de datos */}
-              <input type="hidden" name="type" value={categoryFormData.type} />
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
                 <div className="flex flex-wrap gap-2 p-2 bg-cream-50 rounded-xl border border-tomato-100">
