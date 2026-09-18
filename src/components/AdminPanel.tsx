@@ -72,8 +72,8 @@ const emptyCategoryForm: CategoryForm = {
 };
 
 export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) {
-  const { items, addItem, updateItem, deleteItem } = useMenu();
-  const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
+  const { items, addItem, updateItem, deleteItem, loading: menuLoading } = useMenu();
+  const { categories, addCategory, updateCategory, deleteCategory, loading: categoriesLoading } = useCategories();
   const [activeTab, setActiveTab] = useState<'products' | 'categories'>('products');
   const [searchQuery, setSearchQuery] = useState("");
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -84,6 +84,18 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [editingCategory, setEditingCategory] = useState<{ id: number } | null>(null);
   const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
   const [viewMode, setViewMode] = useState<'list' | 'by-category'>('by-category');
+
+  // Mostrar loading mientras se cargan los datos
+  if (menuLoading || categoriesLoading) {
+    return (
+      <div className="min-h-screen bg-cream-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-tomato-200 border-t-tomato-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-tomato-700 font-bold">Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Agrupar productos por categoría para la vista optimizada
   const productsByCategory = useMemo(() => {
