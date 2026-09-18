@@ -1,15 +1,4 @@
 ```
 # Build artifacts
 dist/
-*.js
-
-# Dependencies
-node_modules/
-
-# Editors
-.vscode/
-
-# Logs and temp files
-*.log
-*.tmp
 ```
