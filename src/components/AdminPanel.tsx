@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useMenu } from "../context/MenuContext";
 import { useCategories } from "../context/CategoryContext";
 import { MenuItem } from "../data/menu";
@@ -83,6 +83,30 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [showCategories, setShowCategories] = useState(false);
   const [editingCategory, setEditingCategory] = useState<{ id: number } | null>(null);
   const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
+  const [viewMode, setViewMode] = useState<'list' | 'by-category'>('by-category');
+
+  // Agrupar productos por categoría para la vista optimizada
+  const productsByCategory = useMemo(() => {
+    const grouped: Record<string, Product[]> = {};
+    
+    // Inicializar grupos para todas las categorías existentes
+    categories.forEach(cat => {
+      grouped[cat.type] = [];
+    });
+    
+    // Asignar productos a sus categorías
+    products.forEach(product => {
+      if (grouped[product.type]) {
+        grouped[product.type].push(product);
+      } else {
+        // Si el producto tiene una categoría que ya no existe (o es legacy), lo ponemos en "Otros"
+        if (!grouped['otros']) grouped['otros'] = [];
+        grouped['otros'].push(product);
+      }
+    });
+
+    return grouped;
+  }, [products, categories]);
 
   const filtered = items.filter(
     (i) =>
@@ -307,6 +331,30 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
           >
             <Plus className="w-4 h-4" />
             Nuevo producto
+          </button>
+        </div>
+
+        {/* Toggle Vista */}
+        <div className="flex items-center gap-2 mb-6">
+          <button
+            onClick={() => setViewMode('by-category')}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              viewMode === 'by-category'
+                ? 'bg-tomato-600 text-white shadow-md'
+                : 'bg-white text-tomato-600 hover:bg-tomato-50 border border-tomato-100'
+            }`}
+          >
+            Por Categoría
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              viewMode === 'list'
+                ? 'bg-tomato-600 text-white shadow-md'
+                : 'bg-white text-tomato-600 hover:bg-tomato-50 border border-tomato-100'
+            }`}
+          >
+            Lista Completa
           </button>
         </div>
 
