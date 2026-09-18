@@ -11,6 +11,14 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
   const { addToCart } = useCart();
   const isOutOfStock = !item.inStock;
 
+  // Verificar si el producto es nuevo (menos de 24 horas desde su creación)
+  const isNew = item.createdAt && (() => {
+    const now = new Date();
+    const createdAt = new Date(item.createdAt!);
+    const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    return hoursDiff < 24;
+  })();
+
   const typeLabel = item.type === "sin_freir" ? "Sin freír" : "Preparado";
   const typeColor = item.type === "sin_freir"
     ? "bg-warm-100 text-warm-700 border-warm-200"
@@ -45,6 +53,13 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
         <span className={`absolute top-2 left-2 sm:top-3 sm:left-3 px-2 py-1 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full border ${typeColor}`}>
           {typeLabel}
         </span>
+
+        {/* New product badge - visible for 24 hours */}
+        {isNew && (
+          <span className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 py-1 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full bg-green-500 text-white shadow-md animate-pulse">
+            NUEVO
+          </span>
+        )}
 
         {/* Out of stock badge */}
         {isOutOfStock && (
