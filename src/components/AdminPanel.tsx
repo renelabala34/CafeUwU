@@ -87,7 +87,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
   // Agrupar productos por categoría para la vista optimizada
   const productsByCategory = useMemo(() => {
-    const grouped: Record<string, Product[]> = {};
+    const grouped: Record<string, MenuItem[]> = {};
     
     // Inicializar grupos para todas las categorías existentes
     categories.forEach(cat => {
@@ -95,7 +95,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     });
     
     // Asignar productos a sus categorías
-    products.forEach(product => {
+    items.forEach(product => {
       if (grouped[product.type]) {
         grouped[product.type].push(product);
       } else {
@@ -106,7 +106,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     });
 
     return grouped;
-  }, [products, categories]);
+  }, [items, categories]);
 
   const filtered = items.filter(
     (i) =>
