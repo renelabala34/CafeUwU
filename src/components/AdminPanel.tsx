@@ -15,7 +15,15 @@ interface AdminPanelProps {
 const EMOJIS = [
   "🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", "🍖", "🥩", "🍕", "🌮",
   "🍤", "🥘", "🍲", "🥙", "🍛", "🍝", "🥐", "🥖", "🫓", "🧈", "🥚",
-  "🥗", "🫘", "🍚", "🥄", "🍴", "🥢", "🧂", "🌶️", "🧄", "🧅"
+  "🥗", "🫘", "🍚", "🥄", "🍴", "🥢", "🧂", "🌶️", "🧄", "🧅",
+  "🍔", "🍟", "🌯", "🥪", "🍜", "🍣", "🍱", "🍙", "🍘", "🍥",
+  "🥟", "🥠", "🥡", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰",
+  "🧁", "🥧", "🍫", "🍬", "🍭", "🍮", "🍯", "🥛", "☕", "🍵",
+  "🧃", "🥤", "🍶", "🍺", "🍻", "🥂", "🍷", "🥃", "🍸", "🍹",
+  "🥥", "🥝", "🍋", "🍈", "🍉", "🍇", "🍓", "🫐", "🍒", "🍑",
+  "🥭", "🍍", "🥥", "🥑", "🍆", "🥕", "🌽", "🌶️", "🥒", "🥬",
+  "🥦", "🧄", "🧅", "🍄", "🥜", "🌰", "🍞", "🥐", "🥖", "🥨",
+  "🥯", "🥞", "🧇", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟"
 ];
 
 const CATEGORY_COLORS = [
@@ -530,8 +538,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
-                <div className="flex flex-wrap gap-2">
-                  {["📁", "🍗", "🐟", "🌭", "🧀", "🥓", "🥔", "🌽", "🍌", "🍕", "🌮", "🍤", "🥘"].map((e) => (
+                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 bg-cream-50 rounded-xl border border-tomato-100">
+                  {EMOJIS.map((e) => (
                     <button
                       key={e}
                       type="button"
@@ -539,7 +547,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                       className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all ${
                         categoryFormData.emoji === e
                           ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
-                          : "bg-cream-50 hover:bg-cream-100"
+                          : "bg-white hover:bg-cream-100"
                       }`}
                     >
                       {e}
