@@ -256,15 +256,20 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
           <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
             <p className="text-xs text-tomato-500 uppercase tracking-wider">Total productos</p>
             <p className="text-2xl font-black text-tomato-900 mt-1">{items.length}</p>
           </div>
-          {categories.slice(0, 2).map((cat, idx) => (
+          {categories.map((cat) => (
             <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60">
               <p className="text-xs text-tomato-500 uppercase tracking-wider">{cat.name}</p>
-              <p className={`text-2xl font-black mt-1 ${idx === 0 ? 'text-warm-700' : 'text-olive-700'}`}>
+              <p className={`text-2xl font-black mt-1 ${
+                cat.color === "warm" ? "text-warm-700" :
+                cat.color === "olive" ? "text-olive-700" :
+                cat.color === "tomato" ? "text-tomato-700" :
+                "text-cream-700"
+              }`}>
                 {categoryCounts[cat.type] || 0}
               </p>
             </div>

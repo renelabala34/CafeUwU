@@ -121,14 +121,15 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
     
     if (supabase) {
       try {
+        // Verificar si ya existe una categoría con ese nombre o type
         const { data: existing } = await supabase
           .from('categories')
           .select('id')
-          .eq('name', category.name)
+          .or(`name.eq.${category.name},type.eq.${category.type}`)
           .maybeSingle();
 
         if (existing) {
-          alert('Ya existe una categoría con ese nombre.');
+          alert('Ya existe una categoría con ese nombre o tipo.');
           return;
         }
 
@@ -140,10 +141,17 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
 
         if (error) throw error;
         setCategories((prev) => [...prev, dbToCategory(data)]);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error adding category:', error);
-        const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
-        setCategories((prev) => [...prev, { ...categoryWithTimestamp, id: newId }]);
+        // Si el error es porque la tabla no existe, usar fallback local
+        if (error?.message?.includes('relation') || error?.message?.includes('does not exist')) {
+          const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
+          setCategories((prev) => [...prev, { ...categoryWithTimestamp, id: newId }]);
+          alert('La tabla categories no existe en Supabase. La categoría se guardó localmente.');
+        } else {
+          const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
+          setCategories((prev) => [...prev, { ...categoryWithTimestamp, id: newId }]);
+        }
       }
     } else {
       const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
@@ -161,9 +169,14 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
 
         if (error) throw error;
         setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error updating category:', error);
-        setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+        // Si el error es porque la tabla no existe, usar fallback local
+        if (error?.message?.includes('relation') || error?.message?.includes('does not exist')) {
+          setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+        } else {
+          setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+        }
       }
     } else {
       setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
@@ -180,9 +193,14 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
 
         if (error) throw error;
         setCategories((prev) => prev.filter((c) => c.id !== id));
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting category:', error);
-        setCategories((prev) => prev.filter((c) => c.id !== id));
+        // Si el error es porque la tabla no existe, usar fallback local
+        if (error?.message?.includes('relation') || error?.message?.includes('does not exist')) {
+          setCategories((prev) => prev.filter((c) => c.id !== id));
+        } else {
+          setCategories((prev) => prev.filter((c) => c.id !== id));
+        }
       }
     } else {
       setCategories((prev) => prev.filter((c) => c.id !== id));
@@ -201,8 +219,18 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         if (data) {
           setCategories(data.map(dbToCategory));
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error refreshing categories:', error);
+        // Si la tabla no existe, mantener las categorías en memoria
+        if (!error?.message?.includes('relation') && !error?.message?.includes('does not exist')) {
+          // Otros errores, intentar cargar de localStorage
+          const stored = localStorage.getItem("imas_categories");
+          if (stored) {
+            try {
+              setCategories(JSON.parse(stored));
+            } catch {}
+          }
+        }
       }
     } else {
       const stored = localStorage.getItem("imas_categories");
