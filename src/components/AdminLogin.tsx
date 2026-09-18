@@ -26,11 +26,12 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
         if (username === "admin" && password === "admin123") {
           sessionStorage.setItem("admin_auth", "true");
           sessionStorage.setItem("admin_username", username);
+          setLoading(false);
           onLogin();
         } else {
           setError("Usuario o contraseña incorrectos");
+          setLoading(false);
         }
-        setLoading(false);
         return;
       }
 
@@ -58,9 +59,11 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
         // Guardar autenticación y username del usuario logueado
         sessionStorage.setItem("admin_auth", "true");
         sessionStorage.setItem("admin_username", username);
+        setLoading(false);
         onLogin();
       } else {
         setError("Usuario o contraseña incorrectos");
+        setLoading(false);
       }
     } catch (err) {
       setError("Error al iniciar sesión. Intenta de nuevo.");
