@@ -11,7 +11,9 @@ export interface MenuItem {
   createdAt?: string;
 }
 
-export const sections = [
+// Las categorías ahora son dinámicas, se gestionan desde CategoryContext
+// Estas son solo valores por defecto iniciales
+export const defaultSections = [
   { id: "todos", name: "Todos", description: "" },
   { id: "sin_freir", name: "Ofertas sin freír", description: "Productos crudos/preparados para freír en casa" },
   { id: "preparado", name: "Especial I'MAS — Preparados", description: "Listos para comer" },
