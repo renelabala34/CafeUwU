@@ -38,7 +38,7 @@ interface ItemForm {
   section: string;
   price: string;
   quantity: string;
-  type: "sin_freir" | "preparado";
+  type: string;
   description: string;
   emoji: string;
   inStock: boolean;
@@ -47,7 +47,7 @@ interface ItemForm {
 interface CategoryForm {
   name: string;
   description: string;
-  type: "sin_freir" | "preparado";
+  type: string;
   emoji: string;
   color: string;
 }
@@ -118,7 +118,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       section: formData.section,
       price: parseFloat(formData.price) || 0,
       quantity: parseInt(formData.quantity) || 1,
-      type: formData.type as "sin_freir" | "preparado",
+      type: formData.type,
       description: formData.description,
       emoji: formData.emoji,
       inStock: formData.inStock,
@@ -149,7 +149,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         setFormData({ 
           ...formData, 
           section: value,
-          type: value as "sin_freir" | "preparado"
+          type: value
         });
       } else {
         setFormData({ ...formData, [name]: value });
@@ -164,7 +164,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     setCategoryFormData({ ...categoryFormData, [name]: value });
   };
 
-  const openCategoryForm = (category?: { id: number; name: string; description: string; type: "sin_freir" | "preparado"; emoji: string; color: string }) => {
+  const openCategoryForm = (category?: { id: number; name: string; description: string; type: string; emoji: string; color: string }) => {
     if (category) {
       setEditingCategory({ id: category.id });
       setCategoryFormData({
@@ -196,8 +196,28 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     await deleteCategory(id);
   };
 
-  const sinFreirCount = items.filter((i) => i.type === "sin_freir").length;
-  const preparadoCount = items.filter((i) => i.type === "preparado").length;
+  const getCategoryCounts = () => {
+    const counts: Record<string, number> = {};
+    items.forEach(item => {
+      counts[item.type] = (counts[item.type] || 0) + 1;
+    });
+    return counts;
+  };
+  
+  const categoryCounts = getCategoryCounts();
+  
+  // Helper para obtener el color de una categoría por su type
+  const getCategoryColor = (type: string) => {
+    const cat = categories.find(c => c.type === type);
+    if (!cat) return "warm";
+    return cat.color;
+  };
+  
+  // Helper para obtener el nombre de una categoría por su type
+  const getCategoryName = (type: string) => {
+    const cat = categories.find(c => c.type === type);
+    return cat ? cat.name : type;
+  };
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -241,14 +261,14 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             <p className="text-xs text-tomato-500 uppercase tracking-wider">Total productos</p>
             <p className="text-2xl font-black text-tomato-900 mt-1">{items.length}</p>
           </div>
-          <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
-            <p className="text-xs text-tomato-500 uppercase tracking-wider">Sin freír</p>
-            <p className="text-2xl font-black text-warm-700 mt-1">{sinFreirCount}</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
-            <p className="text-xs text-tomato-500 uppercase tracking-wider">Preparados</p>
-            <p className="text-2xl font-black text-olive-700 mt-1">{preparadoCount}</p>
-          </div>
+          {categories.slice(0, 2).map((cat, idx) => (
+            <div key={cat.id} className="bg-white rounded-xl p-4 border border-tomato-100/60">
+              <p className="text-xs text-tomato-500 uppercase tracking-wider">{cat.name}</p>
+              <p className={`text-2xl font-black mt-1 ${idx === 0 ? 'text-warm-700' : 'text-olive-700'}`}>
+                {categoryCounts[cat.type] || 0}
+              </p>
+            </div>
+          ))}
           <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
             <p className="text-xs text-tomato-500 uppercase tracking-wider">Disponibles</p>
             <p className="text-2xl font-black text-tomato-900 mt-1">
@@ -314,11 +334,15 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.type === "sin_freir"
+                        getCategoryColor(item.type) === "warm"
                           ? "bg-warm-100 text-warm-700"
-                          : "bg-olive-100 text-olive-700"
+                          : getCategoryColor(item.type) === "olive"
+                          ? "bg-olive-100 text-olive-700"
+                          : getCategoryColor(item.type) === "tomato"
+                          ? "bg-tomato-100 text-tomato-700"
+                          : "bg-cream-100 text-cream-700"
                       }`}>
-                        {item.type === "sin_freir" ? "Sin freír" : "Preparado"}
+                        {getCategoryName(item.type)}
                       </span>
                     </td>
                     <td className="px-6 py-4 font-black text-tomato-900">${item.price} CUP</td>
@@ -359,9 +383,9 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                     <p className="text-xs text-tomato-500 mt-0.5">{item.quantity} unidades</p>
                     <div className="flex items-center gap-2 mt-2">
                       <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${
-                        item.type === "sin_freir" ? "bg-warm-100 text-warm-700" : "bg-olive-100 text-olive-700"
+                        getCategoryColor(item.type) === "warm" ? "bg-warm-100 text-warm-700" : getCategoryColor(item.type) === "olive" ? "bg-olive-100 text-olive-700" : getCategoryColor(item.type) === "tomato" ? "bg-tomato-100 text-tomato-700" : "bg-cream-100 text-cream-700"
                       }`}>
-                        {item.type === "sin_freir" ? "Sin freír" : "Preparado"}
+                        {getCategoryName(item.type)}
                       </span>
                       <span className="text-xs font-black text-tomato-900">${item.price} CUP</span>
                     </div>
@@ -416,6 +440,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                       <option key={cat.id} value={cat.type}>{cat.name}</option>
                     ))}
                   </select>
+                  <p className="text-xs text-tomato-500 mt-1">La sección determina la categoría del producto</p>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Precio (CUP) *</label>
@@ -530,11 +555,16 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Tipo *</label>
-                <select name="type" value={categoryFormData.type} onChange={handleCategoryChange}
-                  className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all">
-                  <option value="sin_freir">Sin freír</option>
-                  <option value="preparado">Preparado</option>
-                </select>
+                <input 
+                  type="text" 
+                  name="type" 
+                  value={categoryFormData.type} 
+                  onChange={handleCategoryChange} 
+                  required
+                  placeholder="Ej: sin_freir, preparado, postres, bebidas..."
+                  className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" 
+                />
+                <p className="text-xs text-tomato-500 mt-1">El tipo se usará como identificador interno (sin espacios ni caracteres especiales)</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
@@ -611,7 +641,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                   </div>
                   <div>
                     <h4 className="font-bold text-tomato-900 text-sm">{cat.name}</h4>
-                    <p className="text-xs text-tomato-500">{cat.type === "sin_freir" ? "Sin freír" : "Preparado"}</p>
+                    <p className="text-xs text-tomato-500">{cat.type}</p>
                   </div>
                 </div>
                 <div className="flex gap-1">
