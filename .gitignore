@@ -1,15 +1,45 @@
 ```
+# Build artifacts
+dist/
+build/
+
 # Dependencies
 node_modules/
 
-# Build artifacts
-dist/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.python-version
 
-# Vite cache
-.vite/
+# Logs
+*.log
 
-# Environment
+# Environment variables
 .env
 .env.local
 .env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
 ```
