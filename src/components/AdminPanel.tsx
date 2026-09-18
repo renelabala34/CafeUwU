@@ -737,20 +737,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 <textarea name="description" value={categoryFormData.description} onChange={handleCategoryChange} required rows={2}
                   className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all resize-none" />
               </div>
-              <div>
-                <label className="block text-sm font-bold text-tomato-800 mb-1.5">Tipo (automático)</label>
-                <input 
-                  type="text" 
-                  name="type" 
-                  value={categoryFormData.type} 
-                  onChange={handleCategoryChange} 
-                  required
-                  disabled={!editingCategory}
-                  placeholder="Se genera automáticamente al escribir el nombre"
-                  className="w-full px-4 py-2.5 bg-gray-100 border border-tomato-100 rounded-xl text-sm text-gray-600 cursor-not-allowed" 
-                />
-                <p className="text-xs text-tomato-500 mt-1">El identificador se genera automáticamente basado en el nombre (solo editable al crear)</p>
-              </div>
+              {/* Campo tipo oculto - es un identificador técnico para la base de datos */}
+              <input type="hidden" name="type" value={categoryFormData.type} />
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
                 <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 bg-cream-50 rounded-xl border border-tomato-100">
@@ -849,7 +837,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </div>
             <button
               onClick={() => {
-                setEditingCategory(null);
+                setEditingCategory({ id: -1 });
                 setCategoryFormData({
                   ...emptyCategoryForm,
                   type: `cat_${Date.now()}`,
