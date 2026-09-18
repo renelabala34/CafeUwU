@@ -48,11 +48,12 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
         throw new Error("Supabase no está configurado");
       }
 
-      // Obtener credenciales actuales
+      // Obtener credenciales actuales usando el username almacenado en sessionStorage
+      const currentUsername = sessionStorage.getItem("admin_username") || "admin";
       const { data: credentials, error: fetchError } = await supabase
         .from("admin_credentials")
         .select("*")
-        .eq("username", "admin")
+        .eq("username", currentUsername)
         .single();
 
       if (fetchError || !credentials) {
@@ -76,14 +77,14 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
       const newSalt = generateSalt();
       const newPasswordHash = await hashPassword(newPassword, newSalt);
 
-      // Actualizar en la base de datos
+      // Actualizar en la base de datos para el usuario actual
       const { error: updateError } = await supabase
         .from("admin_credentials")
         .update({
           password_hash: newPasswordHash,
           salt: newSalt,
         })
-        .eq("username", "admin");
+        .eq("username", currentUsername);
 
       if (updateError) {
         throw new Error("Error al actualizar la contraseña");

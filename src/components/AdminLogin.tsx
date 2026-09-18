@@ -25,6 +25,7 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
         // Fallback: credenciales por defecto si Supabase no está configurado
         if (username === "admin" && password === "admin123") {
           sessionStorage.setItem("admin_auth", "true");
+          sessionStorage.setItem("admin_username", username);
           onLogin();
         } else {
           setError("Usuario o contraseña incorrectos");
@@ -54,7 +55,9 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
       );
 
       if (isValid) {
+        // Guardar autenticación y username del usuario logueado
         sessionStorage.setItem("admin_auth", "true");
+        sessionStorage.setItem("admin_username", username);
         onLogin();
       } else {
         setError("Usuario o contraseña incorrectos");
