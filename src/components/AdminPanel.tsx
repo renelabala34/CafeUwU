@@ -219,10 +219,11 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         color: category.color,
       });
     } else {
-      setEditingCategory(null);
+      setEditingCategory({ id: -1 });
+      const autoType = `cat_${Date.now()}`;
       setCategoryFormData({
         ...emptyCategoryForm,
-        type: `cat_${Date.now()}`,
+        type: autoType,
       });
     }
     setActiveTab('categories');
@@ -397,7 +398,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </button>
             </div>
 
-        {/* Vista por Categoría */}
+        {/* Vista por Categoría - Optimizada sin scroll */}
         {viewMode === 'by-category' && (
           <div className="space-y-6 mb-8">
             {Object.entries(productsByCategory).map(([type, products]) => {
@@ -415,6 +416,12 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
               if (products.length === 0) return null;
 
+              // Calcular columnas dinámicas según cantidad de productos
+              const gridCols = products.length === 1 ? 'grid-cols-1' : 
+                               products.length === 2 ? 'grid-cols-2' : 
+                               products.length <= 4 ? 'grid-cols-2 sm:grid-cols-3' : 
+                               'grid-cols-2 sm:grid-cols-3 md:grid-cols-4';
+
               return (
                 <div key={type} className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
                   <div className={`${headerColorClass} px-6 py-4`}>
@@ -429,48 +436,37 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                     </div>
                   </div>
                   <div className="p-4">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-tomato-100">
-                            <th className="text-left py-2 px-3 text-xs font-bold text-tomato-600 uppercase">Producto</th>
-                            <th className="text-left py-2 px-3 text-xs font-bold text-tomato-600 uppercase">Precio</th>
-                            <th className="text-left py-2 px-3 text-xs font-bold text-tomato-600 uppercase">Stock</th>
-                            <th className="text-right py-2 px-3 text-xs font-bold text-tomato-600 uppercase">Acciones</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-tomato-50">
-                          {products.map((item) => (
-                            <tr key={item.id} className="hover:bg-cream-50/50">
-                              <td className="py-3 px-3">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-lg">{item.emoji}</span>
-                                  <span className="font-bold text-tomato-900 text-sm">{item.name}</span>
-                                </div>
-                              </td>
-                              <td className="py-3 px-3 font-black text-tomato-900">${item.price}</td>
-                              <td className="py-3 px-3">
-                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-full ${
+                    {/* Grid de tarjetas en lugar de tabla para mejor visualización */}
+                    <div className={`grid ${gridCols} gap-3`}>
+                      {products.map((item) => (
+                        <div key={item.id} className="bg-cream-50 rounded-xl p-3 border border-tomato-100/50 hover:border-tomato-200 transition-all">
+                          <div className="flex flex-col items-center text-center gap-2">
+                            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center">
+                              <span className="text-2xl">{item.emoji}</span>
+                            </div>
+                            <div className="w-full">
+                              <p className="font-bold text-tomato-900 text-xs line-clamp-1">{item.name}</p>
+                              <p className="font-black text-tomato-700 text-sm">${item.price}</p>
+                              <div className="flex items-center justify-center gap-1 mt-1">
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-full ${
                                   item.inStock ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
                                 }`}>
                                   <span className={`w-1.5 h-1.5 rounded-full ${item.inStock ? "bg-green-500" : "bg-red-500"}`} />
                                   {item.inStock ? 'Disp.' : 'Agot.'}
                                 </span>
-                              </td>
-                              <td className="py-3 px-3">
-                                <div className="flex items-center justify-end gap-1">
-                                  <button onClick={() => openEditForm(item)} className="p-1.5 hover:bg-tomato-50 rounded-lg">
-                                    <Edit2 className="w-4 h-4 text-tomato-500" />
-                                  </button>
-                                  <button onClick={() => setDeleteConfirm(item.id)} className="p-1.5 hover:bg-red-50 rounded-lg">
-                                    <Trash2 className="w-4 h-4 text-red-500" />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 w-full mt-2 pt-2 border-t border-tomato-100/50">
+                              <button onClick={() => openEditForm(item)} className="flex-1 p-1.5 hover:bg-tomato-50 rounded-lg transition-colors">
+                                <Edit2 className="w-4 h-4 text-tomato-500 mx-auto" />
+                              </button>
+                              <button onClick={() => setDeleteConfirm(item.id)} className="flex-1 p-1.5 hover:bg-red-50 rounded-lg transition-colors">
+                                <Trash2 className="w-4 h-4 text-red-500 mx-auto" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
