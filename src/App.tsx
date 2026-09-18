@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { CartProvider } from "./context/CartContext";
 import { MenuProvider, useMenu } from "./context/MenuContext";
 import { CategoryProvider, useCategories } from "./context/CategoryContext";
-import { defaultSections, MenuItem } from "./data/menu";
+import { defaultSections, MenuItem, businessInfo } from "./data/menu";
 import Header from "./components/Header";
 import MenuItemCard from "./components/MenuItemCard";
 import MenuItemDetail from "./components/MenuItemDetail";
