@@ -230,13 +230,20 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
   const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingCategory) {
-      await updateCategory(editingCategory.id, categoryFormData);
-    } else {
-      await addCategory(categoryFormData);
+    console.log('Guardando categoría:', categoryFormData, 'editingCategory:', editingCategory);
+    try {
+      if (editingCategory) {
+        await updateCategory(editingCategory.id, categoryFormData);
+      } else {
+        await addCategory(categoryFormData);
+      }
+      setEditingCategory(null);
+      setCategoryFormData(emptyCategoryForm);
+      alert('Categoría guardada exitosamente');
+    } catch (error) {
+      console.error('Error al guardar categoría:', error);
+      alert('Error al guardar la categoría. Revisa la consola para más detalles.');
     }
-    setActiveTab('categories');
-    setEditingCategory(null);
   };
 
   const handleDeleteCategory = async (id: number) => {
