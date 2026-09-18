@@ -115,18 +115,6 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
   const addCategory = async (category: Omit<Category, "id">) => {
     if (supabase) {
       try {
-        // Verificar si ya existe una categoría con ese nombre o type
-        const { data: existing } = await supabase
-          .from('categories')
-          .select('id')
-          .or(`name.eq.${category.name},type.eq.${category.type}`)
-          .maybeSingle();
-
-        if (existing) {
-          alert('Ya existe una categoría con ese nombre o tipo.');
-          return;
-        }
-
         const { data, error } = await supabase
           .from('categories')
           .insert([categoryToDb(category)])
@@ -141,7 +129,6 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         if (error?.message?.includes('relation') || error?.message?.includes('does not exist')) {
           const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
           setCategories((prev) => [...prev, { ...category, id: newId }]);
-          alert('La tabla categories no existe en Supabase. La categoría se guardó localmente.');
         } else {
           const newId = Math.max(...categories.map((c) => c.id), 0) + 1;
           setCategories((prev) => [...prev, { ...category, id: newId }]);
