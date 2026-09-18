@@ -106,7 +106,7 @@ function ShopContent() {
         </div>
         {/* Imagen de fondo de comida cubana */}
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-15 mix-blend-overlay"
+          className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=1920&q=80')"
           }}

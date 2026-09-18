@@ -113,7 +113,16 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     if (type === "checkbox") {
       setFormData({ ...formData, [name]: (e.target as HTMLInputElement).checked });
     } else {
-      setFormData({ ...formData, [name]: value });
+      // When section changes, also update type to match
+      if (name === "section") {
+        setFormData({ 
+          ...formData, 
+          section: value,
+          type: value as "sin_freir" | "preparado"
+        });
+      } else {
+        setFormData({ ...formData, [name]: value });
+      }
     }
   };
 
