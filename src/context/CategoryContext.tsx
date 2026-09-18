@@ -5,7 +5,7 @@ export interface Category {
   id: number;
   name: string;
   description: string;
-  type: "sin_freir" | "preparado";
+  type: string;
   emoji: string;
   color: string;
   createdAt?: string;

@@ -4,7 +4,7 @@ export interface MenuItem {
   section: string;
   price: number;
   quantity: number;
-  type: "sin_freir" | "preparado";
+  type: string;
   description: string;
   emoji: string;
   inStock: boolean;
