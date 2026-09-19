@@ -567,32 +567,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         {/* Table - Solo mostrar en vista Lista Completa */}
         {viewMode === 'list' && (
           <div>
-            {/* Bulk Actions Bar - Sticky para Desktop y Mobile */}
-            {selectedProductIds.length > 0 && (
-              <div className="sticky top-16 z-30 bg-tomato-600 text-white px-4 py-3 flex items-center justify-between shadow-md">
-                <span className="font-bold text-sm">{selectedProductIds.length} producto(s) seleccionado(s)</span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleBulkSetAvailable}
-                    className="px-3 py-1.5 bg-green-500 hover:bg-green-600 rounded-lg text-xs font-semibold transition-colors"
-                  >
-                    Marcar Disponibles
-                  </button>
-                  <button
-                    onClick={handleBulkSetOutOfStock}
-                    className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 rounded-lg text-xs font-semibold transition-colors"
-                  >
-                    Marcar Agotado
-                  </button>
-                  <button
-                    onClick={handleBulkDelete}
-                    className="px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold transition-colors"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </div>
-            )}
             <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden relative">
               <table className="w-full">
               <thead className="bg-cream-50 border-b border-tomato-100">
@@ -718,32 +692,10 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </div>
           )}
         </div>
-      )}
+        )}
       {/* Fin pestaña Productos */}
 
-      {/* Modales y formularios (fuera de las pestañas) */}
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setShowForm(false)} />
-          <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
-            <div className="sticky top-0 bg-white border-b border-tomato-100 px-6 py-4 flex items-center justify-between rounded-t-3xl z-10">
-              <h2 className="text-lg font-black text-tomato-900">
-                {editingItem ? "Editar producto" : "Nuevo producto"}
-              </h2>
-              <button onClick={() => setShowForm(false)} className="p-2 hover:bg-tomato-50 rounded-full">
-                <X className="w-5 h-5 text-tomato-600" />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Nombre *</label>
-                  <input type="text" name="name" value={formData.name} onChange={handleChange} required
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Sección *</label>
+      {/* Contenido de la pestaña Categorías - Lista principal */}
                   <select name="section" value={formData.section} onChange={handleChange}
                     className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all">
                     {categories.map((cat) => (
