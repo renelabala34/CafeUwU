@@ -92,6 +92,57 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
   const [viewMode, setViewMode] = useState<'list' | 'by-category'>('list');
   
+  // Estado para gestión masiva de productos
+  const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
+
+  // Toggle selección individual
+  const toggleProductSelection = (id: number) => {
+    setSelectedProductIds(prev => 
+      prev.includes(id) 
+        ? prev.filter(pid => pid !== id) 
+        : [...prev, id]
+    );
+  };
+
+  // Toggle selección todos
+  const toggleSelectAll = () => {
+    if (selectedProductIds.length === filtered.length) {
+      setSelectedProductIds([]);
+    } else {
+      setSelectedProductIds(filtered.map(p => p.id));
+    }
+  };
+
+  // Acciones masivas
+  const handleBulkDelete = async () => {
+    if (window.confirm(`¿Estás seguro de eliminar ${selectedProductIds.length} productos?`)) {
+      try {
+        await Promise.all(selectedProductIds.map(id => deleteItem(id)));
+        setSelectedProductIds([]);
+        showToast('Productos eliminados correctamente', 'success');
+      } catch (error) {
+        showToast('Error al eliminar productos', 'error');
+      }
+    }
+  };
+
+  const handleBulkAvailability = async (available: boolean) => {
+    try {
+      await Promise.all(
+        selectedProductIds.map(async (id) => {
+          const product = items.find(p => p.id === id);
+          if (product) {
+            await updateItem(id, { ...product, inStock: available });
+          }
+        })
+      );
+      setSelectedProductIds([]);
+      showToast(`Productos marcados como ${available ? 'disponibles' : 'agotados'}`, 'success');
+    } catch (error) {
+      showToast('Error al actualizar productos', 'error');
+    }
+  };
+
   // Prevent body scroll when any modal/form is open in admin panel
   useEffect(() => {
     if (showForm || showChangePassword || editingCategory !== null) {
