@@ -719,6 +719,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
           )}
         </div>
       )}
+      {/* Fin pestaña Productos */}
 
       {/* Modales y formularios (fuera de las pestañas) */}
       {/* Form Modal */}
@@ -1057,8 +1058,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
           )}
         </div>
       )}
-      {/* Fin pestaña Categorías */}
-      </main>
     </div>
-  );
+  </main>
+);
 }
