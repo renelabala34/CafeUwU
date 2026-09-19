@@ -1059,6 +1059,5 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         </div>
       )}
     </div>
-  </main>
-);
+  );
 }
