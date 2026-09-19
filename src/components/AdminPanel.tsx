@@ -27,10 +27,18 @@ const EMOJIS = [
 ];
 
 const CATEGORY_COLORS = [
-  { value: "warm", label: "Cálido", class: "bg-warm-100 text-warm-700" },
-  { value: "olive", label: "Oliva", class: "bg-olive-100 text-olive-700" },
-  { value: "tomato", label: "Tomate", class: "bg-tomato-100 text-tomato-700" },
-  { value: "cream", label: "Crema", class: "bg-cream-100 text-cream-700" },
+  { value: "warm", class: "bg-warm-100 text-warm-700 border-warm-300" },
+  { value: "olive", class: "bg-olive-100 text-olive-700 border-olive-300" },
+  { value: "tomato", class: "bg-tomato-100 text-tomato-700 border-tomato-300" },
+  { value: "cream", class: "bg-cream-100 text-cream-700 border-cream-300" },
+  { value: "sky", class: "bg-sky-100 text-sky-700 border-sky-300" },
+  { value: "violet", class: "bg-violet-100 text-violet-700 border-violet-300" },
+  { value: "rose", class: "bg-rose-100 text-rose-700 border-rose-300" },
+  { value: "amber", class: "bg-amber-100 text-amber-700 border-amber-300" },
+  { value: "emerald", class: "bg-emerald-100 text-emerald-700 border-emerald-300" },
+  { value: "cyan", class: "bg-cyan-100 text-cyan-700 border-cyan-300" },
+  { value: "fuchsia", class: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300" },
+  { value: "lime", class: "bg-lime-100 text-lime-700 border-lime-300" },
 ];
 
 interface ItemForm {
@@ -650,21 +658,23 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji (opcional)</label>
-                  <div className="flex flex-wrap gap-2">
-                    {EMOJIS.map((e) => (
-                      <button
-                        key={e}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, emoji: e })}
-                        className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all ${
-                          formData.emoji === e
-                            ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
-                            : "bg-cream-50 hover:bg-cream-100"
-                        }`}
-                      >
-                        {e}
-                      </button>
-                    ))}
+                  <div className="overflow-x-auto pb-2 scrollbar-hide" style={{ whiteSpace: 'nowrap', WebkitOverflowScrolling: 'touch' }}>
+                    <div className="inline-flex gap-2">
+                      {EMOJIS.map((e) => (
+                        <button
+                          key={e}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, emoji: e })}
+                          className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                            formData.emoji === e
+                              ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
+                              : "bg-cream-50 hover:bg-cream-100"
+                          }`}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 pt-6">
@@ -744,39 +754,40 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
-                <div className="flex flex-wrap gap-2 p-2 bg-cream-50 rounded-xl border border-tomato-100">
-                  {EMOJIS.map((e) => (
-                    <button
-                      key={e}
-                      type="button"
-                      onClick={() => setCategoryFormData({ ...categoryFormData, emoji: e })}
-                      className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all ${
-                        categoryFormData.emoji === e
-                          ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
-                          : "bg-white hover:bg-cream-100"
-                      }`}
-                    >
-                      {e}
-                    </button>
-                  ))}
+                <div className="overflow-x-auto pb-2 scrollbar-hide" style={{ whiteSpace: 'nowrap', WebkitOverflowScrolling: 'touch' }}>
+                  <div className="inline-flex gap-2">
+                    {EMOJIS.map((e) => (
+                      <button
+                        key={e}
+                        type="button"
+                        onClick={() => setCategoryFormData({ ...categoryFormData, emoji: e })}
+                        className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                          categoryFormData.emoji === e
+                            ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
+                            : "bg-white hover:bg-cream-100"
+                        }`}
+                      >
+                        {e}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Color</label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                   {CATEGORY_COLORS.map((c) => (
                     <button
                       key={c.value}
                       type="button"
                       onClick={() => setCategoryFormData({ ...categoryFormData, color: c.value })}
-                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                      className={`flex-shrink-0 w-10 h-10 rounded-full border-2 transition-all ${
                         categoryFormData.color === c.value
-                          ? c.class + " ring-2 ring-tomato-500"
-                          : "bg-cream-50 text-tomato-600 hover:bg-cream-100"
+                          ? c.class + " ring-2 ring-tomato-500 scale-110"
+                          : c.class + " hover:scale-105"
                       }`}
-                    >
-                      {c.label}
-                    </button>
+                      title={c.value}
+                    />
                   ))}
                 </div>
               </div>
