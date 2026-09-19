@@ -8,43 +8,14 @@ node_modules/
 # Build outputs
 dist/
 build/
-coverage/
-htmlcov/
-target/
 .out/
+.bundle/
 
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.ENV
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
+# Logs
 *.log
-*.tmp
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Environment variables
 .env
@@ -52,16 +23,17 @@ Thumbs.db
 .env.*
 !.env.example
 
-# Testing
-.mypy_cache/
-.pytest_cache/
-.hypothesis/
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# OS generated
+# OS generated files
 .DS_Store
 Thumbs.db
-ehthumbs.db
-Icon?
-.Trashes
-*.DS_Store
+
+# Coverage
+coverage/
+.nyc_output/
 ```
