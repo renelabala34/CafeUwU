@@ -561,7 +561,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
           {/* Barra de acciones masivas - Desktop */}
           {selectedProductIds.length > 0 && (
-            <div className="hidden md:flex bg-warm-50 border-b border-warm-200 px-6 py-3 items-center justify-between">
+            <div className="hidden md:flex sticky top-0 z-20 bg-warm-50 border-b border-warm-200 px-6 py-3 items-center justify-between shadow-md">
               <span className="text-sm font-bold text-warm-800">
                 {selectedProductIds.length} producto{selectedProductIds.length !== 1 ? 's' : ''} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
               </span>
@@ -676,7 +676,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
           {/* Barra de acciones masivas - Mobile */}
           {selectedProductIds.length > 0 && (
-            <div className="md:hidden bg-warm-50 border-b border-warm-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+            <div className="md:hidden sticky top-16 z-20 bg-warm-50 border-b border-warm-200 px-4 py-3 flex items-center justify-between shadow-md">
               <span className="text-sm font-bold text-warm-800">
                 {selectedProductIds.length} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
               </span>
