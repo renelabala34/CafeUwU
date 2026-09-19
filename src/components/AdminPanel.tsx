@@ -658,8 +658,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji (opcional)</label>
-                  <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50">
-                    <div className="flex flex-wrap gap-2" style={{ maxHeight: '180px', overflowY: 'auto' }}>
+                  <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50 overflow-y-auto" style={{ maxHeight: '180px' }}>
+                    <div className="flex flex-wrap gap-2 justify-center">
                       {EMOJIS.map((e) => (
                         <button
                           key={e}
@@ -667,7 +667,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                           onClick={() => setFormData({ ...formData, emoji: e })}
                           className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all flex-shrink-0 ${
                             formData.emoji === e
-                              ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110 z-10 relative"
+                              ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110 z-20 relative"
                               : "bg-white hover:bg-cream-100"
                           }`}
                         >
@@ -754,8 +754,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
-                <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50">
-                  <div className="flex flex-wrap gap-2" style={{ maxHeight: '180px', overflowY: 'auto' }}>
+                <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50 overflow-y-auto" style={{ maxHeight: '180px' }}>
+                  <div className="flex flex-wrap gap-2 justify-center">
                     {EMOJIS.map((e) => (
                       <button
                         key={e}
@@ -763,7 +763,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                         onClick={() => setCategoryFormData({ ...categoryFormData, emoji: e })}
                         className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all flex-shrink-0 ${
                           categoryFormData.emoji === e
-                            ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110 z-10 relative"
+                            ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110 z-20 relative"
                             : "bg-white hover:bg-cream-100"
                         }`}
                       >
@@ -775,8 +775,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Color</label>
-                <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50">
-                  <div className="flex flex-wrap gap-2" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50 overflow-y-auto" style={{ maxHeight: '120px' }}>
+                  <div className="flex flex-wrap gap-2 justify-center">
                     {CATEGORY_COLORS.map((c) => (
                       <button
                         key={c.value}
@@ -784,7 +784,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                         onClick={() => setCategoryFormData({ ...categoryFormData, color: c.value })}
                         className={`flex-shrink-0 w-8 h-8 rounded-full border-2 transition-all ${
                           categoryFormData.color === c.value
-                            ? c.class + " ring-2 ring-tomato-500 scale-110 z-10 relative"
+                            ? c.class + " ring-2 ring-tomato-500 scale-110 z-20 relative"
                             : c.class + " hover:scale-105"
                         }`}
                         title={c.value}
