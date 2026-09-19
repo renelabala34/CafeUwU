@@ -558,7 +558,27 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
         {/* Table - Solo mostrar en vista Lista Completa */}
         {viewMode === 'list' && (
-          <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
+          <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden relative">
+            {/* Bulk Actions Bar - Desktop */}
+            {selectedProductIds.length > 0 && (
+              <div className="hidden md:flex sticky top-16 z-30 bg-tomato-600 text-white px-6 py-3 items-center justify-between shadow-md">
+                <span className="font-bold text-sm">{selectedProductIds.length} producto(s) seleccionado(s)</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleBulkAvailability}
+                    className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Alternar Stock
+                  </button>
+                  <button
+                    onClick={handleBulkDelete}
+                    className="px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            )}
             {/* Vista Desktop - Tabla */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
@@ -677,6 +697,27 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </div>
             ))}
           </div>
+
+          {/* Bulk Actions Bar - Mobile */}
+          {selectedProductIds.length > 0 && (
+            <div className="md:hidden sticky top-16 z-30 bg-tomato-600 text-white px-4 py-3 items-center justify-between shadow-md flex">
+              <span className="font-bold text-sm">{selectedProductIds.length} producto(s) seleccionado(s)</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleBulkAvailability}
+                  className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-semibold transition-colors"
+                >
+                  Stock
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  className="px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold transition-colors"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          )}
 
           {filtered.length === 0 && (
             <div className="p-12 text-center">
