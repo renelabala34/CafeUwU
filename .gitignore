@@ -11,26 +11,18 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
+.Python
+env/
+venv/
+.venv/
+.ENV
+.python-version
 
 # Logs
 *.log
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Temp files
-*.tmp
-*.swp
-*~
+# Environment
+.env
+.env.local
+.env.*
 ```
