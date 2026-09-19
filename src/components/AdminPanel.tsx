@@ -72,7 +72,7 @@ const emptyCategoryForm: CategoryForm = {
 
 export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) {
   const { items, addItem, updateItem, deleteItem, loading: menuLoading } = useMenu();
-  const { categories, addCategory, updateCategory, deleteCategory, loading: categoriesLoading } = useCategories();
+  const { categories, addCategory, updateCategory, deleteCategory, refreshCategories, loading: categoriesLoading } = useCategories();
   const [activeTab, setActiveTab] = useState<'products' | 'categories'>('products');
   const [searchQuery, setSearchQuery] = useState("");
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -243,10 +243,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       }
       setEditingCategory(null);
       setCategoryFormData(emptyCategoryForm);
-      // Forzar recarga de categorías desde la BD
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // Actualizar categorías sin recargar la página
+      await refreshCategories();
     } catch (error) {
       console.error('Error al guardar categoría:', error);
     }
@@ -816,7 +814,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
           </div>
 
           {/* Toolbar categorías */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6 px-2 sm:px-0">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tomato-400" />
               <input

@@ -1,6 +1,7 @@
 import { ShoppingCart, Eye } from "lucide-react";
 import { MenuItem } from "../data/menu";
 import { useCart } from "../context/CartContext";
+import { useCategories } from "../context/CategoryContext";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -9,6 +10,7 @@ interface MenuItemCardProps {
 
 export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) {
   const { addToCart } = useCart();
+  const { categories } = useCategories();
   const isOutOfStock = !item.inStock;
 
   // Verificar si el producto es nuevo (menos de 24 horas desde su creación)
@@ -19,10 +21,14 @@ export default function MenuItemCard({ item, onViewDetail }: MenuItemCardProps) 
     return hoursDiff < 24;
   })();
 
-  const typeLabel = item.type === "sin_freir" ? "Sin freír" : "Preparado";
-  const typeColor = item.type === "sin_freir"
-    ? "bg-warm-100 text-warm-700 border-warm-200"
-    : "bg-olive-100 text-olive-700 border-olive-200";
+  // Buscar la categoría del producto basado en el type
+  const category = categories.find(cat => cat.type === item.type);
+  const typeLabel = category ? category.name : (item.type === "sin_freir" ? "Sin freír" : "Preparado");
+  const typeColor = category 
+    ? `bg-${category.color}-100 text-${category.color}-700 border-${category.color}-200`
+    : (item.type === "sin_freir"
+        ? "bg-warm-100 text-warm-700 border-warm-200"
+        : "bg-olive-100 text-olive-700 border-olive-200");
 
   return (
     <div className={`group bg-white rounded-2xl shadow-sm hover:shadow-xl border overflow-hidden transition-all duration-300 flex flex-col ${
