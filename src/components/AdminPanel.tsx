@@ -692,10 +692,30 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </div>
           )}
         </div>
-        )}
+      )}
       {/* Fin pestaña Productos */}
 
-      {/* Contenido de la pestaña Categorías - Lista principal */}
+      {/* Formulario de producto (crear/editar) */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setShowForm(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-tomato-900">{editingItem ? "Editar producto" : "Nuevo producto"}</h3>
+              <button type="button" onClick={() => setShowForm(false)} className="p-2 hover:bg-tomato-50 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-tomato-500" />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Nombre del producto *</label>
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} required
+                    placeholder="Ej: Pollo asado entero"
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Sección *</label>
                   <select name="section" value={formData.section} onChange={handleChange}
                     className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all">
                     {categories.map((cat) => (
