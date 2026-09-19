@@ -71,7 +71,7 @@ const emptyCategoryForm: CategoryForm = {
 };
 
 export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) {
-  const { items, addItem, updateItem, deleteItem, loading: menuLoading } = useMenu();
+  const { items, addItem, updateItem, deleteItem, loading: menuLoading, refreshItems } = useMenu();
   const { categories, addCategory, updateCategory, deleteCategory, refreshCategories, loading: categoriesLoading } = useCategories();
   const [activeTab, setActiveTab] = useState<'products' | 'categories'>('products');
   const [searchQuery, setSearchQuery] = useState("");
@@ -237,7 +237,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     console.log('Guardando categoría:', categoryDataWithAutoType, 'editingCategory:', editingCategory);
     try {
       if (editingCategory && editingCategory.id !== -1) {
-        await updateCategory(editingCategory.id, categoryDataWithAutoType);
+        await updateCategory(editingCategory.id, categoryDataWithAutoType, refreshItems);
       } else {
         await addCategory(categoryDataWithAutoType);
       }
