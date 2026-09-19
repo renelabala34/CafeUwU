@@ -431,11 +431,29 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               const categoryColorClass = category?.color === "warm" ? "from-warm-50 to-warm-100 border-warm-200" :
                                          category?.color === "olive" ? "from-olive-50 to-olive-100 border-olive-200" :
                                          category?.color === "tomato" ? "from-tomato-50 to-tomato-100 border-tomato-200" :
-                                         "from-cream-50 to-cream-100 border-cream-200";
+                                         category?.color === "cream" ? "from-cream-50 to-cream-100 border-cream-200" :
+                                         category?.color === "sky" ? "from-sky-50 to-sky-100 border-sky-200" :
+                                         category?.color === "violet" ? "from-violet-50 to-violet-100 border-violet-200" :
+                                         category?.color === "rose" ? "from-rose-50 to-rose-100 border-rose-200" :
+                                         category?.color === "amber" ? "from-amber-50 to-amber-100 border-amber-200" :
+                                         category?.color === "emerald" ? "from-emerald-50 to-emerald-100 border-emerald-200" :
+                                         category?.color === "cyan" ? "from-cyan-50 to-cyan-100 border-cyan-200" :
+                                         category?.color === "fuchsia" ? "from-fuchsia-50 to-fuchsia-100 border-fuchsia-200" :
+                                         category?.color === "lime" ? "from-lime-50 to-lime-100 border-lime-200" :
+                                         "from-gray-50 to-gray-100 border-gray-200";
               const headerColorClass = category?.color === "warm" ? "bg-warm-500" :
                                        category?.color === "olive" ? "bg-olive-500" :
                                        category?.color === "tomato" ? "bg-tomato-500" :
-                                       "bg-cream-500";
+                                       category?.color === "cream" ? "bg-cream-500" :
+                                       category?.color === "sky" ? "bg-sky-500" :
+                                       category?.color === "violet" ? "bg-violet-500" :
+                                       category?.color === "rose" ? "bg-rose-500" :
+                                       category?.color === "amber" ? "bg-amber-500" :
+                                       category?.color === "emerald" ? "bg-emerald-500" :
+                                       category?.color === "cyan" ? "bg-cyan-500" :
+                                       category?.color === "fuchsia" ? "bg-fuchsia-500" :
+                                       category?.color === "lime" ? "bg-lime-500" :
+                                       "bg-gray-500";
 
               if (products.length === 0) return null;
 
@@ -823,7 +841,16 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                     cat.color === "warm" ? "text-warm-700" :
                     cat.color === "olive" ? "text-olive-700" :
                     cat.color === "tomato" ? "text-tomato-700" :
-                    "text-cream-700"
+                    cat.color === "cream" ? "text-cream-700" :
+                    cat.color === "sky" ? "text-sky-700" :
+                    cat.color === "violet" ? "text-violet-700" :
+                    cat.color === "rose" ? "text-rose-700" :
+                    cat.color === "amber" ? "text-amber-700" :
+                    cat.color === "emerald" ? "text-emerald-700" :
+                    cat.color === "cyan" ? "text-cyan-700" :
+                    cat.color === "fuchsia" ? "text-fuchsia-700" :
+                    cat.color === "lime" ? "text-lime-700" :
+                    "text-gray-700"
                   }`}>
                     {count} {count === 1 ? 'producto' : 'productos'}
                   </p>
@@ -876,7 +903,16 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                           cat.color === "warm" ? "bg-warm-100" :
                           cat.color === "olive" ? "bg-olive-100" :
                           cat.color === "tomato" ? "bg-tomato-100" :
-                          "bg-cream-100"
+                          cat.color === "cream" ? "bg-cream-100" :
+                          cat.color === "sky" ? "bg-sky-100" :
+                          cat.color === "violet" ? "bg-violet-100" :
+                          cat.color === "rose" ? "bg-rose-100" :
+                          cat.color === "amber" ? "bg-amber-100" :
+                          cat.color === "emerald" ? "bg-emerald-100" :
+                          cat.color === "cyan" ? "bg-cyan-100" :
+                          cat.color === "fuchsia" ? "bg-fuchsia-100" :
+                          cat.color === "lime" ? "bg-lime-100" :
+                          "bg-gray-100"
                         }`}>
                           <span className="text-2xl">{cat.emoji}</span>
                         </div>
