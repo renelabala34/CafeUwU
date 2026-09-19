@@ -1,31 +1,31 @@
-```
-# Build artifacts
-dist/
-build/
-
+```gitignore
 # Dependencies
 node_modules/
 
-# Logs and temp files
-*.log
-*.tmp
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
+# Build outputs
+dist/
+build/
+target/
 
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.py.class
+.Python
+env/
+venv/
+.venv/
+.env
+.env.local
+.env.*
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
-# Compiled files
+# Compiled and binary files
 *.o
 *.obj
 *.so
@@ -33,17 +33,44 @@ __pycache__/
 *.dll
 *.exe
 *.out
+*.class
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Testing
-.pytest_cache/
-.mypy_cache/
+# Logs and temp files
+*.log
+*.tmp
+*.temp
 
-# System
+# OS specific
 .DS_Store
 Thumbs.db
+
+# Archives
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
