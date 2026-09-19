@@ -695,7 +695,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       )}
       {/* Fin pestaña Productos */}
 
-      {/* Formulario de producto (crear/editar) */}
+      {/* Formulario de producto (crear/editar) - FUERA de las pestañas */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setShowForm(false)} />
