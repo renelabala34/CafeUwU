@@ -1,6 +1,7 @@
 import { X, ShoppingCart, Minus, Plus, Clock, MapPin, Tag } from "lucide-react";
 import { MenuItem, businessInfo } from "../data/menu";
 import { useCart } from "../context/CartContext";
+import { useCategories } from "../context/CategoryContext";
 import { useState } from "react";
 
 interface MenuItemDetailProps {
@@ -10,6 +11,7 @@ interface MenuItemDetailProps {
 
 export default function MenuItemDetail({ item, onClose }: MenuItemDetailProps) {
   const { addToCart } = useCart();
+  const { categories } = useCategories();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const isOutOfStock = !item.inStock;
@@ -23,10 +25,14 @@ export default function MenuItemDetail({ item, onClose }: MenuItemDetailProps) {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const typeLabel = item.type === "sin_freir" ? "Sin freír" : "Preparado";
-  const typeColor = item.type === "sin_freir"
-    ? "bg-warm-100 text-warm-700"
-    : "bg-olive-100 text-olive-700";
+  // Buscar la categoría del producto basado en el type
+  const category = categories.find(cat => cat.type === item.type);
+  const typeLabel = category ? category.name : (item.type === "sin_freir" ? "Sin freír" : "Preparado");
+  const typeColor = category 
+    ? `bg-${category.color}-100 text-${category.color}-700`
+    : (item.type === "sin_freir"
+        ? "bg-warm-100 text-warm-700"
+        : "bg-olive-100 text-olive-700");
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
