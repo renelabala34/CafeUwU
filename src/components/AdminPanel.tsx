@@ -3,7 +3,7 @@ import { useMenu } from "../context/MenuContext";
 import { useCategories } from "../context/CategoryContext";
 import { MenuItem } from "../data/menu";
 import {
-  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save, Key, FolderKanban,
+  Plus, Edit2, Trash2, LogOut, ArrowLeft, Package, Search, X, Save, Key, FolderKanban, Check,
 } from "lucide-react";
 import ChangePassword from "./ChangePassword";
 
@@ -91,6 +91,44 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [editingCategory, setEditingCategory] = useState<{ id: number } | null>(null);
   const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
   const [viewMode, setViewMode] = useState<'list' | 'by-category'>('list');
+  
+  // Estado para gestión masiva de productos
+  const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
+
+  // Toggle selección individual
+  const toggleProductSelection = (id: number) => {
+    setSelectedProductIds(prev => 
+      prev.includes(id) 
+        ? prev.filter(pid => pid !== id) 
+        : [...prev, id]
+    );
+  };
+
+  // Toggle selección todos
+  const toggleSelectAll = () => {
+    if (selectedProductIds.length === filtered.length) {
+      setSelectedProductIds([]);
+    } else {
+      setSelectedProductIds(filtered.map(p => p.id));
+    }
+  };
+
+  // Acciones masivas
+  const handleBulkDelete = () => {
+    if (window.confirm(`¿Estás seguro de eliminar ${selectedProductIds.length} productos?`)) {
+      setItems(prev => prev.filter(p => !selectedProductIds.includes(p.id)));
+      setSelectedProductIds([]);
+      showToast('Productos eliminados correctamente', 'success');
+    }
+  };
+
+  const handleBulkAvailability = (available: boolean) => {
+    setItems(prev => prev.map(p => 
+      selectedProductIds.includes(p.id) ? { ...p, available } : p
+    ));
+    setSelectedProductIds([]);
+    showToast(`Productos marcados como ${available ? 'disponibles' : 'no disponibles'}`, 'success');
+  };
 
   // Prevent body scroll when any modal/form is open in admin panel
   useEffect(() => {
@@ -519,10 +557,53 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         {/* Table - Solo mostrar en vista Lista Completa */}
         {viewMode === 'list' && (
         <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
+          {/* Barra de acciones masivas */}
+          {selectedProductIds.length > 0 && (
+            <div className="bg-warm-50 border-b border-warm-200 px-6 py-3 flex items-center justify-between">
+              <span className="text-sm font-bold text-warm-800">
+                {selectedProductIds.length} producto{selectedProductIds.length !== 1 ? 's' : ''} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleBulkAvailability(true)}
+                  className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-all"
+                >
+                  Marcar Disponibles
+                </button>
+                <button
+                  onClick={() => handleBulkAvailability(false)}
+                  className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition-all"
+                >
+                  Marcar Agotados
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  className="px-3 py-1.5 bg-tomato-600 hover:bg-tomato-700 text-white text-xs font-bold rounded-lg transition-all"
+                >
+                  Eliminar
+                </button>
+                <button
+                  onClick={() => setSelectedProductIds([])}
+                  className="p-1.5 hover:bg-warm-100 rounded-lg"
+                >
+                  <X className="w-4 h-4 text-warm-600" />
+                </button>
+              </div>
+            </div>
+          )}
+          
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-cream-50 border-b border-tomato-100">
                 <tr>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider w-12">
+                    <input
+                      type="checkbox"
+                      checked={filtered.length > 0 && selectedProductIds.length === filtered.length}
+                      onChange={toggleSelectAll}
+                      className="w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
+                    />
+                  </th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Producto</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Sección</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Precio</th>
@@ -532,7 +613,15 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </thead>
               <tbody className="divide-y divide-tomato-100">
                 {filtered.map((item) => (
-                  <tr key={item.id} className="hover:bg-cream-50/50 transition-colors">
+                  <tr key={item.id} className={`hover:bg-cream-50/50 transition-colors ${selectedProductIds.includes(item.id) ? 'bg-warm-50' : ''}`}>
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedProductIds.includes(item.id)}
+                        onChange={() => toggleProductSelection(item.id)}
+                        className="w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
@@ -584,9 +673,48 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
           {/* Mobile */}
           <div className="md:hidden divide-y divide-tomato-100">
+            {selectedProductIds.length > 0 && (
+              <div className="bg-warm-50 border-b border-warm-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+                <span className="text-sm font-bold text-warm-800">
+                  {selectedProductIds.length} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleBulkAvailability(true)}
+                    className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleBulkAvailability(false)}
+                    className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleBulkDelete}
+                    className="p-2 bg-tomato-600 hover:bg-tomato-700 text-white rounded-lg"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setSelectedProductIds([])}
+                    className="p-2 hover:bg-warm-100 rounded-lg"
+                  >
+                    <X className="w-4 h-4 text-warm-600" />
+                  </button>
+                </div>
+              </div>
+            )}
             {filtered.map((item) => (
-              <div key={item.id} className="p-4">
+              <div key={item.id} className={`p-4 ${selectedProductIds.includes(item.id) ? 'bg-warm-50' : ''}`}>
                 <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedProductIds.includes(item.id)}
+                    onChange={() => toggleProductSelection(item.id)}
+                    className="mt-1 w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
+                  />
                   <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
                     <span className="text-2xl">{item.emoji}</span>
                   </div>
