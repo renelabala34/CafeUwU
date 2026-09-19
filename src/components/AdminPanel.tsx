@@ -719,7 +719,9 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
           )}
         </div>
       )}
+      {/* Fin pestaña Productos */}
 
+      {/* Modales y formularios (fuera de las pestañas) */}
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1055,7 +1057,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </div>
           )}
         </div>
-      </main>
+      )}
     </div>
-  );
+  </main>
+);
 }
