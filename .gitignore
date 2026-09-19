@@ -1,13 +1,19 @@
-```gitignore
+```
 # Dependencies
 node_modules/
+.pnpm-store/
+.npm/
+.yarn/
 
 # Build outputs
 dist/
 build/
+coverage/
+htmlcov/
 target/
+.out/
 
-# Python
+# Python specific
 __pycache__/
 *.pyc
 *.pyo
@@ -17,19 +23,21 @@ env/
 venv/
 .venv/
 .ENV
-.python-version
-.pytest_cache/
-.mypy_cache/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
 .coverage
-coverage/
-
-# Logs
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
 *.log
-
-# Environment variables
-.env
-.env.local
-.env.*
+*.tmp
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
@@ -38,39 +46,22 @@ coverage/
 *.swo
 *.tmp
 
-# OS
+# Environment variables
+.env
+.env.local
+.env.*
+!.env.example
+
+# Testing
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+
+# OS generated
 .DS_Store
 Thumbs.db
-
-# Compiled and binary files
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
-# Archives
-*.zip
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
+ehthumbs.db
+Icon?
+.Trashes
+*.DS_Store
 ```
