@@ -114,20 +114,33 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   };
 
   // Acciones masivas
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (window.confirm(`¿Estás seguro de eliminar ${selectedProductIds.length} productos?`)) {
-      setItems(prev => prev.filter(p => !selectedProductIds.includes(p.id)));
-      setSelectedProductIds([]);
-      showToast('Productos eliminados correctamente', 'success');
+      try {
+        await Promise.all(selectedProductIds.map(id => deleteItem(id)));
+        setSelectedProductIds([]);
+        showToast('Productos eliminados correctamente', 'success');
+      } catch (error) {
+        showToast('Error al eliminar productos', 'error');
+      }
     }
   };
 
-  const handleBulkAvailability = (available: boolean) => {
-    setItems(prev => prev.map(p => 
-      selectedProductIds.includes(p.id) ? { ...p, available } : p
-    ));
-    setSelectedProductIds([]);
-    showToast(`Productos marcados como ${available ? 'disponibles' : 'no disponibles'}`, 'success');
+  const handleBulkAvailability = async (available: boolean) => {
+    try {
+      await Promise.all(
+        selectedProductIds.map(async (id) => {
+          const product = items.find(p => p.id === id);
+          if (product) {
+            await updateItem(id, { ...product, inStock: available });
+          }
+        })
+      );
+      setSelectedProductIds([]);
+      showToast(`Productos marcados como ${available ? 'disponibles' : 'agotados'}`, 'success');
+    } catch (error) {
+      showToast('Error al actualizar productos', 'error');
+    }
   };
 
   // Prevent body scroll when any modal/form is open in admin panel
