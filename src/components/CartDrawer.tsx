@@ -1,6 +1,7 @@
 import { X, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { businessInfo } from "../data/menu";
+import { useEffect } from "react";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -10,6 +11,18 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
   const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
+
+  // Prevent body scroll when drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

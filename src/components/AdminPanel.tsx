@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useMenu } from "../context/MenuContext";
 import { useCategories } from "../context/CategoryContext";
 import { MenuItem } from "../data/menu";
@@ -83,6 +83,18 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [editingCategory, setEditingCategory] = useState<{ id: number } | null>(null);
   const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
   const [viewMode, setViewMode] = useState<'list' | 'by-category'>('list');
+
+  // Prevent body scroll when any modal/form is open in admin panel
+  useEffect(() => {
+    if (showForm || showChangePassword || editingCategory !== null) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [showForm, showChangePassword, editingCategory]);
 
   // Mostrar loading mientras se cargan los datos
   if (menuLoading || categoriesLoading) {
