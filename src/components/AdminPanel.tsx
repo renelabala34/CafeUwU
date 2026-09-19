@@ -409,7 +409,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
         {/* Contenido de la pestaña Productos */}
         {activeTab === 'products' && (
-          <>
+          <div className="space-y-6">
             {/* Stats - Solo total y disponibles en pestaña Productos */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
@@ -566,7 +566,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
         {/* Table - Solo mostrar en vista Lista Completa */}
         {viewMode === 'list' && (
-          <>
+          <div>
             {/* Bulk Actions Bar - Sticky para Desktop y Mobile */}
             {selectedProductIds.length > 0 && (
               <div className="sticky top-16 z-30 bg-tomato-600 text-white px-4 py-3 flex items-center justify-between shadow-md">
@@ -717,9 +717,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               <p className="text-tomato-700 font-bold">No hay productos</p>
             </div>
           )}
-        </>
-        )}
-      </main>
+        </div>
+      )}
 
       {/* Form Modal */}
       {showForm && (
@@ -923,7 +922,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
       {/* Contenido de la pestaña Categorías - Lista principal */}
       {activeTab === 'categories' && (
-        <>
+        <div className="space-y-6">
           {/* Stats - Solo en pestaña Categorías */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 px-2 sm:px-0">
             {categories.map((cat) => {
@@ -1055,7 +1054,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </button>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
