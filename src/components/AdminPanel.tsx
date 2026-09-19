@@ -561,7 +561,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
         <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
           {/* Barra de acciones masivas - Desktop */}
           {selectedProductIds.length > 0 && (
-            <div className="hidden md:flex sticky top-0 z-20 bg-warm-50 border-b border-warm-200 px-6 py-3 items-center justify-between shadow-md">
+            <div className="hidden md:flex sticky top-16 z-30 bg-warm-50 border-b border-warm-200 px-6 py-3 items-center justify-between shadow-md">
               <span className="text-sm font-bold text-warm-800">
                 {selectedProductIds.length} producto{selectedProductIds.length !== 1 ? 's' : ''} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
               </span>
@@ -587,6 +587,41 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 <button
                   onClick={() => setSelectedProductIds([])}
                   className="p-1.5 hover:bg-warm-100 rounded-lg"
+                >
+                  <X className="w-4 h-4 text-warm-600" />
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {/* Barra de acciones masivas - Mobile */}
+          {selectedProductIds.length > 0 && (
+            <div className="md:hidden sticky top-16 z-30 bg-warm-50 border-b border-warm-200 px-4 py-3 flex items-center justify-between shadow-md">
+              <span className="text-sm font-bold text-warm-800">
+                {selectedProductIds.length} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleBulkAvailability(true)}
+                  className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg"
+                >
+                  <Check className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleBulkAvailability(false)}
+                  className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  className="p-2 bg-tomato-600 hover:bg-tomato-700 text-white rounded-lg"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setSelectedProductIds([])}
+                  className="p-2 hover:bg-warm-100 rounded-lg"
                 >
                   <X className="w-4 h-4 text-warm-600" />
                 </button>
@@ -673,41 +708,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </tbody>
             </table>
           </div>
-
-          {/* Barra de acciones masivas - Mobile */}
-          {selectedProductIds.length > 0 && (
-            <div className="md:hidden sticky top-16 z-20 bg-warm-50 border-b border-warm-200 px-4 py-3 flex items-center justify-between shadow-md">
-              <span className="text-sm font-bold text-warm-800">
-                {selectedProductIds.length} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleBulkAvailability(true)}
-                  className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg"
-                >
-                  <Check className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleBulkAvailability(false)}
-                  className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={handleBulkDelete}
-                  className="p-2 bg-tomato-600 hover:bg-tomato-700 text-white rounded-lg"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setSelectedProductIds([])}
-                  className="p-2 hover:bg-warm-100 rounded-lg"
-                >
-                  <X className="w-4 h-4 text-warm-600" />
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Vista Mobile - Cards */}
           <div className="md:hidden divide-y divide-tomato-100">
