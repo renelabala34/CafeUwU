@@ -650,21 +650,23 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji (opcional)</label>
-                  <div className="flex flex-wrap gap-2">
-                    {EMOJIS.map((e) => (
-                      <button
-                        key={e}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, emoji: e })}
-                        className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all ${
-                          formData.emoji === e
-                            ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
-                            : "bg-cream-50 hover:bg-cream-100"
-                        }`}
-                      >
-                        {e}
-                      </button>
-                    ))}
+                  <div className="overflow-x-auto pb-2 scrollbar-hide" style={{ whiteSpace: 'nowrap', WebkitOverflowScrolling: 'touch' }}>
+                    <div className="inline-flex gap-2">
+                      {EMOJIS.map((e) => (
+                        <button
+                          key={e}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, emoji: e })}
+                          className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                            formData.emoji === e
+                              ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
+                              : "bg-cream-50 hover:bg-cream-100"
+                          }`}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 pt-6">
@@ -744,21 +746,23 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
-                <div className="flex flex-wrap gap-2 p-2 bg-cream-50 rounded-xl border border-tomato-100">
-                  {EMOJIS.map((e) => (
-                    <button
-                      key={e}
-                      type="button"
-                      onClick={() => setCategoryFormData({ ...categoryFormData, emoji: e })}
-                      className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all ${
-                        categoryFormData.emoji === e
-                          ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
-                          : "bg-white hover:bg-cream-100"
-                      }`}
-                    >
-                      {e}
-                    </button>
-                  ))}
+                <div className="overflow-x-auto pb-2 scrollbar-hide" style={{ whiteSpace: 'nowrap', WebkitOverflowScrolling: 'touch' }}>
+                  <div className="inline-flex gap-2">
+                    {EMOJIS.map((e) => (
+                      <button
+                        key={e}
+                        type="button"
+                        onClick={() => setCategoryFormData({ ...categoryFormData, emoji: e })}
+                        className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                          categoryFormData.emoji === e
+                            ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
+                            : "bg-white hover:bg-cream-100"
+                        }`}
+                      >
+                        {e}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div>
