@@ -10,8 +10,8 @@ import CartDrawer from "./components/CartDrawer";
 import Checkout from "./components/Checkout";
 import AdminLogin from "./components/AdminLogin";
 import AdminPanel from "./components/AdminPanel";
-import TermsSection from "./components/TermsSection";
-import { SlidersHorizontal, MapPin, Clock, Phone, Instagram, Flame, Leaf } from "lucide-react";
+import TermsModal from "./components/TermsModal";
+import { SlidersHorizontal, MapPin, Clock, Phone, Instagram, Flame, Leaf, BookOpen } from "lucide-react";
 
 type Page = "shop" | "checkout" | "admin-login" | "admin-panel";
 
@@ -26,6 +26,7 @@ function ShopContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => sessionStorage.getItem("admin_auth") === "true"
   );
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
 
   // Función para cambiar de página y actualizar el historial del navegador
   const setPage = useCallback((newPage: Page) => {
@@ -169,6 +170,15 @@ function ShopContent() {
               Comida casera cubana lista para disfrutar. Croquetas, medallones, tamales, bananas y más. 
               Entrega en {businessInfo.delivery_zone} en {businessInfo.lead_time_hours}h.
             </p>
+            <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <button
+                onClick={() => setTermsModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full text-white text-xs sm:text-sm font-bold transition-all"
+              >
+                <BookOpen className="w-4 h-4" />
+                Consulte nuestras reglas y servicios
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2 sm:gap-3">
               <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-[10px] sm:text-xs font-medium">
                 <Leaf className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -248,9 +258,6 @@ function ShopContent() {
         )}
       </main>
 
-      {/* Terms Section */}
-      <TermsSection />
-
       {/* Footer */}
       <footer className="bg-tomato-900 text-cream-100 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -297,10 +304,11 @@ function ShopContent() {
                 Consulta nuestras reglas de servicio para más detalles sobre pedidos, pagos y entregas.
               </p>
               <button
-                onClick={() => setPage("admin-login")}
+                onClick={() => setTermsModalOpen(true)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-cream-300/80 hover:text-white bg-cream-800/30 hover:bg-cream-800/50 rounded-full transition-all"
               >
-                Panel Admin
+                <BookOpen className="w-3.5 h-3.5" />
+                Ver reglas y servicios
               </button>
             </div>
           </div>
@@ -321,6 +329,9 @@ function ShopContent() {
         onClose={() => setCartOpen(false)}
         onCheckout={() => { setCartOpen(false); setPage("checkout"); }}
       />
+
+      {/* Terms Modal */}
+      <TermsModal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} />
     </div>
   );
 }
