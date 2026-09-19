@@ -243,6 +243,10 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       }
       setEditingCategory(null);
       setCategoryFormData(emptyCategoryForm);
+      // Forzar recarga de categorías desde la BD
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {
       console.error('Error al guardar categoría:', error);
     }
@@ -401,7 +405,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
         {/* Vista por Categoría - Optimizada sin scroll */}
         {viewMode === 'by-category' && (
-          <div className="space-y-6 mb-8">
+          <div className="space-y-8 mb-8 px-2 sm:px-4">
             {Object.entries(productsByCategory).map(([type, products]) => {
               const category = categories.find(c => c.type === type);
               const categoryName = category?.name || type;
@@ -417,28 +421,28 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
               if (products.length === 0) return null;
 
-              // Calcular columnas dinámicas según cantidad de productos
+              // Calcular columnas dinámicas según cantidad de productos - optimizado para mostrar todos sin scroll
               const gridCols = products.length === 1 ? 'grid-cols-1' : 
                                products.length === 2 ? 'grid-cols-2' : 
-                               products.length <= 4 ? 'grid-cols-2 sm:grid-cols-3' : 
-                               'grid-cols-2 sm:grid-cols-3 md:grid-cols-4';
+                               products.length <= 4 ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4' : 
+                               'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6';
 
               return (
-                <div key={type} className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
-                  <div className={`${headerColorClass} px-6 py-4`}>
+                <div key={type} className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden shadow-sm">
+                  <div className={`${headerColorClass} px-4 sm:px-6 py-3 sm:py-4`}>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{categoryEmoji}</span>
-                        <h3 className="font-black text-white text-lg">{categoryName}</h3>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <span className="text-xl sm:text-2xl">{categoryEmoji}</span>
+                        <h3 className="font-black text-white text-base sm:text-lg">{categoryName}</h3>
                       </div>
-                      <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white text-xs font-bold">
+                      <span className="bg-white/20 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full text-white text-xs font-bold">
                         {products.length} {products.length === 1 ? 'producto' : 'productos'}
                       </span>
                     </div>
                   </div>
-                  <div className="p-4">
-                    {/* Grid de tarjetas en lugar de tabla para mejor visualización */}
-                    <div className={`grid ${gridCols} gap-3`}>
+                  <div className="p-3 sm:p-4">
+                    {/* Grid de tarjetas en lugar de tabla para mejor visualización - todos visibles sin scroll */}
+                    <div className={`grid ${gridCols} gap-2 sm:gap-3`}>
                       {products.map((item) => (
                         <div key={item.id} className="bg-cream-50 rounded-xl p-3 border border-tomato-100/50 hover:border-tomato-200 transition-all">
                           <div className="flex flex-col items-center text-center gap-2">
@@ -786,7 +790,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
       {activeTab === 'categories' && (
         <>
           {/* Stats - Solo en pestaña Categorías */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 px-2 sm:px-0">
             {categories.map((cat) => {
               const count = categoryCounts[cat.type] || 0;
               return (
@@ -832,7 +836,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-2 sm:px-0">
             {categories
               .filter(cat => 
                 searchQuery === "" || 
