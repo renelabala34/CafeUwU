@@ -2,7 +2,7 @@ import { X, ShoppingCart, Minus, Plus, Clock, MapPin, Tag } from "lucide-react";
 import { MenuItem, businessInfo } from "../data/menu";
 import { useCart } from "../context/CartContext";
 import { useCategories } from "../context/CategoryContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface MenuItemDetailProps {
   item: MenuItem;
@@ -15,6 +15,14 @@ export default function MenuItemDetail({ item, onClose }: MenuItemDetailProps) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const isOutOfStock = !item.inStock;
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.classList.add('modal-open');
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, []);
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;

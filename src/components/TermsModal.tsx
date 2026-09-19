@@ -1,4 +1,5 @@
 import { X, Clock, CreditCard, Truck, Calendar, HeadphonesIcon, Package } from "lucide-react";
+import { useEffect } from "react";
 
 interface TermsModalProps {
   isOpen: boolean;
@@ -6,6 +7,18 @@ interface TermsModalProps {
 }
 
 export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const rules = [

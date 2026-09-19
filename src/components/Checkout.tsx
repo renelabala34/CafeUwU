@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, MessageCircle, ShoppingBag, MapPin, User, Phone, Clock, Info } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { businessInfo } from "../data/menu";
@@ -23,6 +23,18 @@ export default function Checkout({ onBack }: CheckoutProps) {
   const [showTerms, setShowTerms] = useState(false);
   const [termsError, setTermsError] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"efectivo" | "transferencia">("efectivo");
+
+  // Prevent body scroll when TermsModal is open
+  useEffect(() => {
+    if (showTerms) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [showTerms]);
 
   const deliveryFee = totalPrice > 0 ? businessInfo.delivery_fee : 0;
   const grandTotal = totalPrice + deliveryFee;
