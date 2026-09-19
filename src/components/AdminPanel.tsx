@@ -124,12 +124,20 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
     }
   };
 
-  const handleBulkAvailability = async (available: boolean) => {
+  const handleBulkSetAvailable = async () => {
     for (const id of selectedProductIds) {
-      await updateItem(id, { inStock: available });
+      await updateItem(id, { inStock: true });
     }
     setSelectedProductIds([]);
-    alert(`Productos marcados como ${available ? 'disponibles' : 'no disponibles'}`);
+    alert('Productos marcados como disponibles');
+  };
+
+  const handleBulkSetOutOfStock = async () => {
+    for (const id of selectedProductIds) {
+      await updateItem(id, { inStock: false });
+    }
+    setSelectedProductIds([]);
+    alert('Productos marcados como agotados');
   };
 
   // Prevent body scroll when any modal/form is open in admin panel
@@ -558,17 +566,23 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
         {/* Table - Solo mostrar en vista Lista Completa */}
         {viewMode === 'list' && (
-          <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden relative">
-            {/* Bulk Actions Bar - Desktop */}
+          <>
+            {/* Bulk Actions Bar - Sticky para Desktop y Mobile */}
             {selectedProductIds.length > 0 && (
-              <div className="hidden md:flex sticky top-16 z-30 bg-tomato-600 text-white px-6 py-3 items-center justify-between shadow-md">
+              <div className="sticky top-16 z-30 bg-tomato-600 text-white px-4 py-3 flex items-center justify-between shadow-md">
                 <span className="font-bold text-sm">{selectedProductIds.length} producto(s) seleccionado(s)</span>
                 <div className="flex gap-2">
                   <button
-                    onClick={handleBulkAvailability}
-                    className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-semibold transition-colors"
+                    onClick={handleBulkSetAvailable}
+                    className="px-3 py-1.5 bg-green-500 hover:bg-green-600 rounded-lg text-xs font-semibold transition-colors"
                   >
-                    Alternar Stock
+                    Marcar Disponibles
+                  </button>
+                  <button
+                    onClick={handleBulkSetOutOfStock}
+                    className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Marcar Agotado
                   </button>
                   <button
                     onClick={handleBulkDelete}
@@ -579,8 +593,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 </div>
               </div>
             )}
-            {/* Vista Desktop - Tabla */}
-            <div className="hidden md:block overflow-x-auto">
+            <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden relative">
               <table className="w-full">
               <thead className="bg-cream-50 border-b border-tomato-100">
                 <tr>
@@ -698,36 +711,13 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             ))}
           </div>
 
-          {/* Bulk Actions Bar - Mobile */}
-          {selectedProductIds.length > 0 && (
-            <div className="md:hidden sticky top-16 z-30 bg-tomato-600 text-white px-4 py-3 items-center justify-between shadow-md flex">
-              <span className="font-bold text-sm">{selectedProductIds.length} producto(s) seleccionado(s)</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleBulkAvailability}
-                  className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-semibold transition-colors"
-                >
-                  Stock
-                </button>
-                <button
-                  onClick={handleBulkDelete}
-                  className="px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold transition-colors"
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          )}
-
           {filtered.length === 0 && (
             <div className="p-12 text-center">
               <Package className="w-10 h-10 text-tomato-300 mx-auto mb-3" />
               <p className="text-tomato-700 font-bold">No hay productos</p>
             </div>
           )}
-        </div>
-        )}
-          </>
+        </>
         )}
       </main>
 
