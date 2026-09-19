@@ -140,15 +140,36 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateCategory = async (id: number, updates: Partial<Category>) => {
+  const updateCategory = async (id: number, updates: Partial<Category>, refreshItems?: () => Promise<void>) => {
     if (supabase) {
       try {
+        // Primero obtener la categoría actual para comparar el type
+        const { data: currentCategory } = await supabase
+          .from('categories')
+          .select('type')
+          .eq('id', id)
+          .single();
+        
         const { error } = await supabase
           .from('categories')
           .update(categoryToDb(updates))
           .eq('id', id);
 
         if (error) throw error;
+        
+        // Si el type cambió, actualizar también los productos asociados
+        if (currentCategory && updates.type && currentCategory.type !== updates.type) {
+          await supabase
+            .from('menu_items')
+            .update({ type: updates.type })
+            .eq('type', currentCategory.type);
+          
+          // Recargar items para reflejar los cambios si se proporciona la función
+          if (refreshItems) {
+            await refreshItems();
+          }
+        }
+        
         setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
       } catch (error: any) {
         console.error('Error updating category:', error);
