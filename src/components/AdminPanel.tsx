@@ -92,54 +92,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
   const [viewMode, setViewMode] = useState<'list' | 'by-category'>('list');
   
-  // Estado para gestión masiva de productos
-  const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
-
-  // Toggle selección individual
-  const toggleProductSelection = (id: number) => {
-    setSelectedProductIds(prev => 
-      prev.includes(id) 
-        ? prev.filter(pid => pid !== id) 
-        : [...prev, id]
-    );
-  };
-
-  // Toggle selección todos
-  const toggleSelectAll = () => {
-    if (selectedProductIds.length === filtered.length) {
-      setSelectedProductIds([]);
-    } else {
-      setSelectedProductIds(filtered.map(p => p.id));
-    }
-  };
-
-  // Acciones masivas
-  const handleBulkDelete = async () => {
-    if (window.confirm(`¿Estás seguro de eliminar ${selectedProductIds.length} productos?`)) {
-      for (const id of selectedProductIds) {
-        await deleteItem(id);
-      }
-      setSelectedProductIds([]);
-      alert('Productos eliminados correctamente');
-    }
-  };
-
-  const handleBulkSetAvailable = async () => {
-    for (const id of selectedProductIds) {
-      await updateItem(id, { inStock: true });
-    }
-    setSelectedProductIds([]);
-    alert('Productos marcados como disponibles');
-  };
-
-  const handleBulkSetOutOfStock = async () => {
-    for (const id of selectedProductIds) {
-      await updateItem(id, { inStock: false });
-    }
-    setSelectedProductIds([]);
-    alert('Productos marcados como agotados');
-  };
-
   // Prevent body scroll when any modal/form is open in admin panel
   useEffect(() => {
     if (showForm || showChangePassword || editingCategory !== null) {
@@ -571,14 +523,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               <table className="w-full">
               <thead className="bg-cream-50 border-b border-tomato-100">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider w-12">
-                    <input
-                      type="checkbox"
-                      checked={filtered.length > 0 && selectedProductIds.length === filtered.length}
-                      onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
-                    />
-                  </th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Producto</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Sección</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Precio</th>
@@ -588,15 +532,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </thead>
               <tbody className="divide-y divide-tomato-100">
                 {filtered.map((item) => (
-                  <tr key={item.id} className={`hover:bg-cream-50/50 transition-colors ${selectedProductIds.includes(item.id) ? 'bg-warm-50' : ''}`}>
-                    <td className="px-6 py-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedProductIds.includes(item.id)}
-                        onChange={() => toggleProductSelection(item.id)}
-                        className="w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
-                      />
-                    </td>
+                  <tr key={item.id} className="hover:bg-cream-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
@@ -649,14 +585,8 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
           {/* Vista Mobile - Cards */}
           <div className="md:hidden divide-y divide-tomato-100">
             {filtered.map((item) => (
-              <div key={item.id} className={`p-4 ${selectedProductIds.includes(item.id) ? 'bg-warm-50' : ''}`}>
+              <div key={item.id} className="p-4">
                 <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedProductIds.includes(item.id)}
-                    onChange={() => toggleProductSelection(item.id)}
-                    className="mt-1 w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
-                  />
                   <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
                     <span className="text-2xl">{item.emoji}</span>
                   </div>
