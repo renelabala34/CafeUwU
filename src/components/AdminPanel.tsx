@@ -706,8 +706,15 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Precio (CUP) *</label>
-                  <input type="number" min="0" name="price" value={formData.price} onChange={handleChange} required
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
+                  <input
+                    type="number"
+                    min="0"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Cantidad por paquete *</label>
