@@ -412,7 +412,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
         {/* Contenido de la pestaña Productos */}
         {activeTab === 'products' && (
-          <>
+          <div className="space-y-6">
             {/* Stats - Solo total y disponibles en pestaña Productos */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="bg-white rounded-xl p-4 border border-tomato-100/60">
@@ -569,54 +569,11 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
         {/* Table - Solo mostrar en vista Lista Completa */}
         {viewMode === 'list' && (
-        <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden">
-          {/* Barra de acciones masivas */}
-          {selectedProductIds.length > 0 && (
-            <div className="bg-warm-50 border-b border-warm-200 px-6 py-3 flex items-center justify-between">
-              <span className="text-sm font-bold text-warm-800">
-                {selectedProductIds.length} producto{selectedProductIds.length !== 1 ? 's' : ''} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleBulkAvailability(true)}
-                  className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-all"
-                >
-                  Marcar Disponibles
-                </button>
-                <button
-                  onClick={() => handleBulkAvailability(false)}
-                  className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition-all"
-                >
-                  Marcar Agotados
-                </button>
-                <button
-                  onClick={handleBulkDelete}
-                  className="px-3 py-1.5 bg-tomato-600 hover:bg-tomato-700 text-white text-xs font-bold rounded-lg transition-all"
-                >
-                  Eliminar
-                </button>
-                <button
-                  onClick={() => setSelectedProductIds([])}
-                  className="p-1.5 hover:bg-warm-100 rounded-lg"
-                >
-                  <X className="w-4 h-4 text-warm-600" />
-                </button>
-              </div>
-            </div>
-          )}
-          
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full">
+          <div>
+            <div className="bg-white rounded-2xl border border-tomato-100/60 overflow-hidden relative">
+              <table className="w-full">
               <thead className="bg-cream-50 border-b border-tomato-100">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider w-12">
-                    <input
-                      type="checkbox"
-                      checked={filtered.length > 0 && selectedProductIds.length === filtered.length}
-                      onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
-                    />
-                  </th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Producto</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Sección</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-tomato-600 uppercase tracking-wider">Precio</th>
@@ -626,15 +583,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </thead>
               <tbody className="divide-y divide-tomato-100">
                 {filtered.map((item) => (
-                  <tr key={item.id} className={`hover:bg-cream-50/50 transition-colors ${selectedProductIds.includes(item.id) ? 'bg-warm-50' : ''}`}>
-                    <td className="px-6 py-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedProductIds.includes(item.id)}
-                        onChange={() => toggleProductSelection(item.id)}
-                        className="w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
-                      />
-                    </td>
+                  <tr key={item.id} className="hover:bg-cream-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
@@ -684,50 +633,11 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </table>
           </div>
 
-          {/* Mobile */}
+          {/* Vista Mobile - Cards */}
           <div className="md:hidden divide-y divide-tomato-100">
-            {selectedProductIds.length > 0 && (
-              <div className="bg-warm-50 border-b border-warm-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-                <span className="text-sm font-bold text-warm-800">
-                  {selectedProductIds.length} seleccionado{selectedProductIds.length !== 1 ? 's' : ''}
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleBulkAvailability(true)}
-                    className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg"
-                  >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleBulkAvailability(false)}
-                    className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={handleBulkDelete}
-                    className="p-2 bg-tomato-600 hover:bg-tomato-700 text-white rounded-lg"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setSelectedProductIds([])}
-                    className="p-2 hover:bg-warm-100 rounded-lg"
-                  >
-                    <X className="w-4 h-4 text-warm-600" />
-                  </button>
-                </div>
-              </div>
-            )}
             {filtered.map((item) => (
-              <div key={item.id} className={`p-4 ${selectedProductIds.includes(item.id) ? 'bg-warm-50' : ''}`}>
+              <div key={item.id} className="p-4">
                 <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedProductIds.includes(item.id)}
-                    onChange={() => toggleProductSelection(item.id)}
-                    className="mt-1 w-4 h-4 rounded border-tomato-200 text-tomato-600 focus:ring-tomato-500 cursor-pointer"
-                  />
                   <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-cream-100 to-warm-100 flex items-center justify-center shrink-0">
                     <span className="text-2xl">{item.emoji}</span>
                   </div>
@@ -763,29 +673,26 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             </div>
           )}
         </div>
-        )}
-          </>
-        )}
-      </main>
+      )}
+      {/* Fin pestaña Productos */}
 
-      {/* Form Modal */}
+      {/* Formulario de producto (crear/editar) - FUERA de las pestañas */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-tomato-950/60 backdrop-blur-sm" onClick={() => setShowForm(false)} />
-          <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
-            <div className="sticky top-0 bg-white border-b border-tomato-100 px-6 py-4 flex items-center justify-between rounded-t-3xl z-10">
-              <h2 className="text-lg font-black text-tomato-900">
-                {editingItem ? "Editar producto" : "Nuevo producto"}
-              </h2>
-              <button onClick={() => setShowForm(false)} className="p-2 hover:bg-tomato-50 rounded-full">
-                <X className="w-5 h-5 text-tomato-600" />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-tomato-900">{editingItem ? "Editar producto" : "Nuevo producto"}</h3>
+              <button type="button" onClick={() => setShowForm(false)} className="p-2 hover:bg-tomato-50 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-tomato-500" />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Nombre *</label>
+                  <label className="block text-sm font-bold text-tomato-800 mb-1.5">Nombre del producto *</label>
                   <input type="text" name="name" value={formData.name} onChange={handleChange} required
+                    placeholder="Ej: Pollo asado entero"
                     className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
                 </div>
                 <div>
@@ -800,8 +707,15 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Precio (CUP) *</label>
-                  <input type="number" min="0" name="price" value={formData.price} onChange={handleChange} required
-                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all" />
+                  <input
+                    type="number"
+                    min="0"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2.5 bg-cream-50 border border-tomato-100 rounded-xl text-sm text-tomato-900 focus:outline-none focus:ring-2 focus:ring-warm-400/50 transition-all"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Cantidad por paquete *</label>
@@ -970,7 +884,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
       {/* Contenido de la pestaña Categorías - Lista principal */}
       {activeTab === 'categories' && (
-        <>
+        <div className="space-y-6">
           {/* Stats - Solo en pestaña Categorías */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 px-2 sm:px-0">
             {categories.map((cat) => {
@@ -1102,8 +1016,9 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </button>
             </div>
           )}
-        </>
+        </div>
       )}
-    </div>
-  );
+    </main>
+  </div>
+);
 }
