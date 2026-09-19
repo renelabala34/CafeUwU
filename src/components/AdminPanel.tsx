@@ -658,22 +658,24 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
 
                 <div>
                   <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji (opcional)</label>
-                  <div className="overflow-x-auto pb-2 scrollbar-hide" style={{ whiteSpace: 'nowrap', WebkitOverflowScrolling: 'touch' }}>
-                    <div className="inline-flex gap-2">
-                      {EMOJIS.map((e) => (
-                        <button
-                          key={e}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, emoji: e })}
-                          className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all flex-shrink-0 ${
-                            formData.emoji === e
-                              ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
-                              : "bg-cream-50 hover:bg-cream-100"
-                          }`}
-                        >
-                          {e}
-                        </button>
-                      ))}
+                  <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50">
+                    <div className="overflow-x-auto pb-2" style={{ maxHeight: '120px', overflowY: 'auto' }}>
+                      <div className="flex flex-wrap gap-2" style={{ minWidth: 'max-content' }}>
+                        {EMOJIS.map((e) => (
+                          <button
+                            key={e}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, emoji: e })}
+                            className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all flex-shrink-0 ${
+                              formData.emoji === e
+                                ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
+                                : "bg-white hover:bg-cream-100"
+                            }`}
+                          >
+                            {e}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -754,41 +756,45 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Emoji</label>
-                <div className="overflow-x-auto pb-2 scrollbar-hide" style={{ whiteSpace: 'nowrap', WebkitOverflowScrolling: 'touch' }}>
-                  <div className="inline-flex gap-2">
-                    {EMOJIS.map((e) => (
-                      <button
-                        key={e}
-                        type="button"
-                        onClick={() => setCategoryFormData({ ...categoryFormData, emoji: e })}
-                        className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all flex-shrink-0 ${
-                          categoryFormData.emoji === e
-                            ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
-                            : "bg-white hover:bg-cream-100"
-                        }`}
-                      >
-                        {e}
-                      </button>
-                    ))}
+                <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50">
+                  <div className="overflow-x-auto pb-2" style={{ maxHeight: '120px', overflowY: 'auto' }}>
+                    <div className="flex flex-wrap gap-2" style={{ minWidth: 'max-content' }}>
+                      {EMOJIS.map((e) => (
+                        <button
+                          key={e}
+                          type="button"
+                          onClick={() => setCategoryFormData({ ...categoryFormData, emoji: e })}
+                          className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all flex-shrink-0 ${
+                            categoryFormData.emoji === e
+                              ? "bg-tomato-100 ring-2 ring-tomato-500 scale-110"
+                              : "bg-white hover:bg-cream-100"
+                          }`}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-bold text-tomato-800 mb-1.5">Color</label>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                  {CATEGORY_COLORS.map((c) => (
-                    <button
-                      key={c.value}
-                      type="button"
-                      onClick={() => setCategoryFormData({ ...categoryFormData, color: c.value })}
-                      className={`flex-shrink-0 w-10 h-10 rounded-full border-2 transition-all ${
-                        categoryFormData.color === c.value
-                          ? c.class + " ring-2 ring-tomato-500 scale-110"
-                          : c.class + " hover:scale-105"
-                      }`}
-                      title={c.value}
-                    />
-                  ))}
+                <div className="border border-tomato-100 rounded-xl p-3 bg-cream-50">
+                  <div className="flex gap-2 overflow-x-auto pb-2" style={{ maxHeight: '60px', overflowY: 'auto' }}>
+                    {CATEGORY_COLORS.map((c) => (
+                      <button
+                        key={c.value}
+                        type="button"
+                        onClick={() => setCategoryFormData({ ...categoryFormData, color: c.value })}
+                        className={`flex-shrink-0 w-8 h-8 rounded-full border-2 transition-all ${
+                          categoryFormData.color === c.value
+                            ? c.class + " ring-2 ring-tomato-500 scale-110"
+                            : c.class + " hover:scale-105"
+                        }`}
+                        title={c.value}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="flex gap-3 pt-4 border-t border-tomato-100">
