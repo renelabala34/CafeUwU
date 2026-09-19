@@ -2,30 +2,4 @@
 # Build artifacts
 dist/
 build/
-# Dependencies
-node_modules/
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-# Environment
-.env
-.env.local
-.env.*
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-# Logs
-*.log
-# Coverage
-coverage/
-htmlcov/
-.coverage
-# MyPy
-.mypy_cache/
-# Pytest
-.pytest_cache/
 ```
