@@ -82,7 +82,7 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [editingCategory, setEditingCategory] = useState<{ id: number } | null>(null);
   const [categoryFormData, setCategoryFormData] = useState<CategoryForm>(emptyCategoryForm);
-  const [viewMode, setViewMode] = useState<'list' | 'by-category'>('by-category');
+  const [viewMode, setViewMode] = useState<'list' | 'by-category'>('list');
 
   // Mostrar loading mientras se cargan los datos
   if (menuLoading || categoriesLoading) {
@@ -380,16 +380,6 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
             {/* Toggle Vista */}
             <div className="flex items-center gap-2 mb-6">
               <button
-                onClick={() => setViewMode('by-category')}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                  viewMode === 'by-category'
-                    ? 'bg-tomato-600 text-white shadow-md'
-                    : 'bg-white text-tomato-600 hover:bg-tomato-50 border border-tomato-100'
-                }`}
-              >
-                Por Categoría
-              </button>
-              <button
                 onClick={() => setViewMode('list')}
                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                   viewMode === 'list'
@@ -398,6 +388,16 @@ export default function AdminPanel({ onLogout, onBackToShop }: AdminPanelProps) 
                 }`}
               >
                 Lista Completa
+              </button>
+              <button
+                onClick={() => setViewMode('by-category')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                  viewMode === 'by-category'
+                    ? 'bg-tomato-600 text-white shadow-md'
+                    : 'bg-white text-tomato-600 hover:bg-tomato-50 border border-tomato-100'
+                }`}
+              >
+                Por Categoría
               </button>
             </div>
 
